@@ -228,11 +228,11 @@ img {
   grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
   gap: 44px;
   align-items: center;
-  margin-left: 18px;
+  margin-left: 30px;
 }
 
 .hero-content {
-  margin-left: 0px;
+  margin-left: 15px;
 }
 
 .eyebrow,
