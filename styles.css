@@ -596,6 +596,32 @@ img {
   border: 0;
 }
 
+.video-fallback {
+  position: absolute;
+  inset: 0;
+  display: block;
+  color: var(--white);
+}
+
+.video-fallback img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.72);
+}
+
+.video-fallback-label {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(32, 23, 25, 0.8);
+  font-weight: 850;
+  letter-spacing: 0.01em;
+}
+
 .webinar-content {
   padding: 24px;
 }
