@@ -196,37 +196,42 @@ img {
   padding-top: 70px;
 }
 
-.hero-bgshape {
+.hero-bg-shape {
   position: absolute;
-  border-radius: 999px;
-  filter: blur(24px);
-  opacity: 0.65;
+  border-radius: 0;
+  filter: none;
+  opacity: 1;
   pointer-events: none;
+  z-index: 0;
 }
 
 .hero-shape-one {
-  width: 360px;
-  height: 360px;
-  background: rgba(253, 222, 91, 0.38);
-  top: 16%;
-  right: -90px;
+  width: 86px;
+  height: 86px;
+  background: rgba(253, 222, 91, 0.48);
+  top: 46%;
+  left: -8px;
 }
 
 .hero-shape-two {
-  width: 280px;
-  height: 280px;
-  background: rgba(0, 191, 98, 0.16);
-  left: -80px;
-  bottom: 6%;
+  width: 74px;
+  height: 74px;
+  background: rgba(0, 191, 98, 0.22);
+  top: 54%;
+  left: -24px;
 }
 
 .hero-grid {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
-  gap: 56px;
+  grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+  gap: 44px;
   align-items: center;
+}
+
+.hero-content {
+  margin-left: -16px;
 }
 
 .eyebrow,
@@ -1018,6 +1023,10 @@ img {
   .webinar-card:first-child {
     grid-column: span 1;
     display: block;
+  }
+
+  .hero-content {
+    margin-left: 0;
   }
 
   .webinar-grid {
