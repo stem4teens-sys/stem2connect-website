@@ -228,7 +228,7 @@ img {
   grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
   gap: 44px;
   align-items: center;
-  margin-left: 50px;
+  margin-left: 65px;
 }
 
 .hero-content {
