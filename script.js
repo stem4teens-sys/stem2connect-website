@@ -42,17 +42,6 @@ function extractYouTubeVideoId(embedSrc) {
   }
 }
 
-function buildEmbedSrc(videoId) {
-  const params = new URLSearchParams({ rel: "0" });
-
-  // YouTube can require a valid origin for embeds on hosted pages.
-  if (window.location.protocol === "http:" || window.location.protocol === "https:") {
-    params.set("origin", window.location.origin);
-  }
-
-  return `https://www.youtube-nocookie.com/embed/${videoId}?${params.toString()}`;
-}
-
 function createLocalFallback(videoId, title) {
   const link = document.createElement("a");
   link.className = "video-fallback";
@@ -85,11 +74,7 @@ youtubeIframes.forEach((iframe) => {
     if (wrapper) {
       wrapper.replaceChildren(createLocalFallback(videoId, iframe.getAttribute("title")));
     }
-    return;
   }
-
-  iframe.src = buildEmbedSrc(videoId);
-  iframe.referrerPolicy = "strict-origin-when-cross-origin";
 });
 
 revealElements.forEach((element) => {
