@@ -25,7 +25,7 @@ if (navToggle && navLinks) {
 }
 
 const revealElements = document.querySelectorAll(
-  ".section-heading, .value-card, .activity-card, .webinar-card, .team-card, .mission-card, .upcoming-showcase, .timeline-item, .join-card, .social-card"
+  ".section-heading, .value-card, .activity-card, .webinar-card, .team-card, .mission-card, .upcoming-showcase, .timeline-item, .join-card, .testimonial-card, .social-card"
 );
 
 function extractYouTubeVideoId(embedSrc) {
