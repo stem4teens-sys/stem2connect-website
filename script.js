@@ -62,13 +62,176 @@ function extractYouTubeVideoId(embedSrc) {
   if (!embedSrc) return null;
 
   try {
-    const url = new URL(embedSrc);
-    const parts = url.pathname.split("/embed/");
-    if (parts.length < 2) return null;
-    const id = parts[1].split("/")[0];
-    return id || null;
+    const url = new URL(embedSrc, window.location.origin);
+    const host = url.hostname.replace("www.", "");
+
+    if (host === "youtu.be") {
+      const shortId = url.pathname.split("/").filter(Boolean)[0];
+      return shortId && shortId.length === 11 ? shortId : null;
+    }
+
+    if (host.endsWith("youtube.com") || host.endsWith("youtube-nocookie.com")) {
+      if (url.pathname.includes("/embed/")) {
+        const parts = url.pathname.split("/embed/");
+        const id = parts[1] ? parts[1].split("/")[0] : "";
+        return id && id.length === 11 ? id : null;
+      }
+
+      const idFromQuery = url.searchParams.get("v");
+      return idFromQuery && idFromQuery.length === 11 ? idFromQuery : null;
+    }
   } catch {
-    return null;
+    const fallbackMatch = embedSrc.match(/(?:embed\/|youtu\.be\/|[?&]v=)([A-Za-z0-9_-]{11})/);
+    return fallbackMatch ? fallbackMatch[1] : null;
+  }
+
+  return null;
+}
+
+function getYouTubeThumbnailUrl(videoId) {
+  return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+}
+
+function extractSpeakerName(text) {
+  if (!text) return null;
+
+  const patterns = [
+    /\bwith\s+([A-Z][A-Za-z.'-]+(?:\s+[A-Z][A-Za-z.'-]+){0,4})\b/i,
+    /\bby\s+([A-Z][A-Za-z.'-]+(?:\s+[A-Z][A-Za-z.'-]+){0,4})\b/i
+  ];
+
+  for (const pattern of patterns) {
+    const match = text.match(pattern);
+    if (match && match[1]) {
+      const candidate = match[1].trim();
+      if (!/stem2connect/i.test(candidate)) {
+        return candidate;
+      }
+    }
+  }
+
+  return null;
+}
+
+function getCardText(card, selector) {
+  if (!card) return "";
+  const element = card.querySelector(selector);
+  return element ? element.textContent.trim() : "";
+}
+
+function normalizeDateString(rawValue) {
+  if (!rawValue) return null;
+  const trimmed = rawValue.trim();
+  return /^\d{4}-\d{2}-\d{2}$/.test(trimmed) ? trimmed : null;
+}
+
+function buildVideoObjectFromIframe(iframe, index) {
+  const videoId = extractYouTubeVideoId(iframe.getAttribute("src"));
+  if (!videoId) return null;
+
+  const card = iframe.closest(".webinar-card, article");
+  const title =
+    getCardText(card, "h3, h2, h4") ||
+    iframe.getAttribute("title") ||
+    `STEM2Connect Webinar ${index + 1}`;
+
+  const description =
+    getCardText(card, "p") ||
+    iframe.getAttribute("aria-label") ||
+    `Watch ${title} by STEM2Connect.`;
+
+  const speaker =
+    (card && card.getAttribute("data-speaker")) ||
+    iframe.getAttribute("data-speaker") ||
+    extractSpeakerName(title) ||
+    extractSpeakerName(iframe.getAttribute("title"));
+
+  const uploadDate = normalizeDateString(
+    (card && card.getAttribute("data-upload-date")) ||
+    iframe.getAttribute("data-upload-date") ||
+    ""
+  );
+
+  const contentUrl = `https://www.youtube.com/watch?v=${videoId}`;
+  const embedUrl = `https://www.youtube.com/embed/${videoId}`;
+
+  const videoObject = {
+    "@type": "VideoObject",
+    "@id": `${contentUrl}#video`,
+    name: title,
+    description,
+    thumbnailUrl: [getYouTubeThumbnailUrl(videoId)],
+    embedUrl,
+    contentUrl,
+    publisher: { "@id": "https://www.stem2connect.org/#organization" }
+  };
+
+  if (uploadDate) {
+    videoObject.uploadDate = uploadDate;
+  }
+
+  if (speaker) {
+    videoObject.creator = {
+      "@type": "Person",
+      name: speaker
+    };
+  }
+
+  return { videoId, videoObject };
+}
+
+function injectWebinarVideoSchema() {
+  const existingSchemaNode = document.getElementById("stem2connect-webinar-video-schema");
+  const youtubeEmbedIframes = document.querySelectorAll(
+    "iframe[src*='youtube.com/embed'], iframe[src*='youtube-nocookie.com/embed']"
+  );
+
+  if (!youtubeEmbedIframes.length) {
+    if (existingSchemaNode) {
+      existingSchemaNode.remove();
+    }
+    return;
+  }
+
+  const seenVideoIds = new Set();
+  const videoObjects = [];
+
+  youtubeEmbedIframes.forEach((iframe, index) => {
+    const built = buildVideoObjectFromIframe(iframe, index);
+    if (!built) return;
+    if (seenVideoIds.has(built.videoId)) return;
+
+    seenVideoIds.add(built.videoId);
+    videoObjects.push(built.videoObject);
+  });
+
+  if (!videoObjects.length) {
+    if (existingSchemaNode) {
+      existingSchemaNode.remove();
+    }
+    return;
+  }
+
+  const organization = {
+    "@type": "Organization",
+    "@id": "https://www.stem2connect.org/#organization",
+    name: "STEM2Connect",
+    url: "https://www.stem2connect.org",
+    logo: "https://www.stem2connect.org/assets/logo.jpg"
+  };
+
+  const schemaPayload = {
+    "@context": "https://schema.org",
+    "@graph": [organization, ...videoObjects]
+  };
+
+  const schemaNode = existingSchemaNode || document.createElement("script");
+  schemaNode.id = "stem2connect-webinar-video-schema";
+  schemaNode.type = "application/ld+json";
+  schemaNode.textContent = JSON.stringify(schemaPayload, null, 2);
+
+  if (!existingSchemaNode) {
+    document.head.appendChild(schemaNode);
   }
 }
 
@@ -93,7 +256,11 @@ function createLocalFallback(videoId, title) {
   return link;
 }
 
-const youtubeIframes = document.querySelectorAll(".video-wrap iframe[src*='youtube.com/embed']");
+injectWebinarVideoSchema();
+
+const youtubeIframes = document.querySelectorAll(
+  ".video-wrap iframe[src*='youtube.com/embed'], .video-wrap iframe[src*='youtube-nocookie.com/embed']"
+);
 
 youtubeIframes.forEach((iframe) => {
   const videoId = extractYouTubeVideoId(iframe.getAttribute("src"));
