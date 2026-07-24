@@ -24,6 +24,22 @@ if (navToggle && navLinks) {
   });
 }
 
+
+const posterNavLink = document.querySelector('a[data-scroll-target="posters"]');
+if (posterNavLink) {
+  posterNavLink.addEventListener("click", (event) => {
+    const targetId = posterNavLink.getAttribute("data-scroll-target");
+    const targetElement = targetId ? document.getElementById(targetId) : null;
+
+    if (!targetElement) {
+      return;
+    }
+
+    event.preventDefault();
+    targetElement.scrollIntoView({ behavior: "smooth", block: "start" });
+    history.replaceState(null, "", window.location.pathname + window.location.search);
+  });
+}
 const revealElements = document.querySelectorAll(
   ".section-heading, .value-card, .activity-card, .webinar-card, .team-card, .mission-card, .upcoming-showcase, .timeline-item, .join-card, .testimonial-card, .social-card"
 );
