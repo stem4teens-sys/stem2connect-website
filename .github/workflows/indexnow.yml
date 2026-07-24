@@ -1,0 +1,17 @@
+name: Notify IndexNow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  indexnow:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Submit sitemap to IndexNow
+        uses: bojieyang/indexnow-action@v3
+        with:
+          sitemap-location: "https://www.stem2connect.org/sitemap.xml"
+          key: ${{ secrets.INDEXNOW_KEY }}
