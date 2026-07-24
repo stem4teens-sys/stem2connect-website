@@ -844,12 +844,6 @@ img {
   box-shadow: var(--shadow-soft);
 }
 
-.webinar-card:first-child {
-  grid-column: span 2;
-  display: grid;
-  grid-template-columns: 1.25fr 0.75fr;
-}
-
 .video-wrap {
   position: relative;
   aspect-ratio: 16 / 9;
@@ -1272,11 +1266,6 @@ img {
   .activity-grid,
   .team-grid {
     grid-template-columns: repeat(2, 1fr);
-  }
-
-  .webinar-card:first-child {
-    grid-column: span 1;
-    display: block;
   }
 
   .hero-content {
