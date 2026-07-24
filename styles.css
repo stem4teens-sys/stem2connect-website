@@ -973,6 +973,60 @@ img {
   gap: 18px;
 }
 
+.resources-posters-section {
+  background:
+    radial-gradient(circle at 12% 10%, rgba(170, 0, 0, 0.08), transparent 16rem),
+    radial-gradient(circle at 88% 20%, rgba(0, 191, 98, 0.12), transparent 18rem),
+    var(--white);
+}
+
+.posters-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.poster-card {
+  display: grid;
+  gap: 18px;
+  padding: 22px;
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--border);
+  box-shadow: 0 12px 32px rgba(32, 23, 25, 0.07);
+}
+
+.poster-embed-wrap {
+  overflow: hidden;
+  border-radius: 22px;
+  border: 1px solid rgba(32, 23, 25, 0.08);
+  background: linear-gradient(135deg, rgba(255, 244, 218, 0.55), rgba(255, 255, 255, 0.96));
+}
+
+.poster-embed-wrap iframe {
+  display: block;
+  width: 100%;
+  min-height: 560px;
+  border: 0;
+}
+
+.poster-card-content {
+  display: grid;
+  gap: 10px;
+}
+
+.poster-card-content h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+
+.poster-card-content p {
+  margin: 0;
+  color: var(--muted);
+}
+
 .resource-card {
   display: flex;
   flex-direction: column;
@@ -1238,6 +1292,7 @@ img {
   }
 
   .resources-grid,
+  .posters-grid,
   .resources-coming-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -1348,6 +1403,7 @@ img {
   }
 
   .resources-grid,
+  .posters-grid,
   .resources-coming-grid {
     grid-template-columns: 1fr;
   }
