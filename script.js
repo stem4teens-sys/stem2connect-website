@@ -16,26 +16,28 @@ if (navToggle && navLinks) {
 
   navLinks.querySelectorAll("a").forEach((link) => {
     link.addEventListener("click", () => {
-
-const isResourcesPage = Boolean(document.querySelector(".resources-hero"));
-if (isResourcesPage && "scrollRestoration" in history) {
-  history.scrollRestoration = "manual";
-  window.addEventListener(
-    "pageshow",
-    () => {
-      if (!window.location.hash) {
-        window.scrollTo(0, 0);
-      }
-    },
-    { once: true }
-  );
-}
       navLinks.classList.remove("active");
       navToggle.classList.remove("active");
       navToggle.setAttribute("aria-expanded", "false");
       document.body.classList.remove("nav-open");
     });
   });
+}
+
+const isResourcesPage = Boolean(document.querySelector(".resources-hero"));
+if (isResourcesPage) {
+  if ("scrollRestoration" in history) {
+    history.scrollRestoration = "manual";
+  }
+
+  const resetResourcesScroll = () => {
+    if (!window.location.hash) {
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    }
+  };
+
+  window.addEventListener("pageshow", resetResourcesScroll);
+  resetResourcesScroll();
 }
 
 
