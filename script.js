@@ -16,6 +16,20 @@ if (navToggle && navLinks) {
 
   navLinks.querySelectorAll("a").forEach((link) => {
     link.addEventListener("click", () => {
+
+const isResourcesPage = Boolean(document.querySelector(".resources-hero"));
+if (isResourcesPage && "scrollRestoration" in history) {
+  history.scrollRestoration = "manual";
+  window.addEventListener(
+    "pageshow",
+    () => {
+      if (!window.location.hash) {
+        window.scrollTo(0, 0);
+      }
+    },
+    { once: true }
+  );
+}
       navLinks.classList.remove("active");
       navToggle.classList.remove("active");
       navToggle.setAttribute("aria-expanded", "false");
@@ -37,7 +51,6 @@ if (posterNavLink) {
 
     event.preventDefault();
     targetElement.scrollIntoView({ behavior: "smooth", block: "start" });
-    history.replaceState(null, "", window.location.pathname + window.location.search);
   });
 }
 const revealElements = document.querySelectorAll(
