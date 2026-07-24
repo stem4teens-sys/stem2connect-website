@@ -25,6 +25,7 @@ if (navToggle && navLinks) {
 }
 
 const isResourcesPage = Boolean(document.querySelector(".resources-hero"));
+
 if (isResourcesPage) {
   if ("scrollRestoration" in history) {
     history.scrollRestoration = "manual";
@@ -32,29 +33,27 @@ if (isResourcesPage) {
 
   const resetResourcesScroll = () => {
     if (!window.location.hash) {
-      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
     }
   };
 
-  window.addEventListener("pageshow", resetResourcesScroll);
   resetResourcesScroll();
-}
 
+  window.addEventListener("DOMContentLoaded", resetResourcesScroll);
+  window.addEventListener("load", () => {
+    resetResourcesScroll();
 
-const posterNavLink = document.querySelector('a[data-scroll-target="posters"]');
-if (posterNavLink) {
-  posterNavLink.addEventListener("click", (event) => {
-    const targetId = posterNavLink.getAttribute("data-scroll-target");
-    const targetElement = targetId ? document.getElementById(targetId) : null;
-
-    if (!targetElement) {
-      return;
-    }
-
-    event.preventDefault();
-    targetElement.scrollIntoView({ behavior: "smooth", block: "start" });
+    setTimeout(resetResourcesScroll, 50);
+    setTimeout(resetResourcesScroll, 250);
+    setTimeout(resetResourcesScroll, 750);
   });
+
+  window.addEventListener("pageshow", resetResourcesScroll);
 }
+
+
 const revealElements = document.querySelectorAll(
   ".section-heading, .value-card, .activity-card, .webinar-card, .team-card, .mission-card, .upcoming-showcase, .timeline-item, .join-card, .testimonial-card, .social-card"
 );
