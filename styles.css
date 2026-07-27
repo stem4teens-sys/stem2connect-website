@@ -771,6 +771,54 @@ img {
   color: #bd8500;
 }
 
+.timeline-item.cryptography .timeline-dot {
+  background: #6b57e2;
+}
+
+.timeline-item.cryptography .timeline-date {
+  color: #5d49c8;
+}
+
+.timeline-item.cryptography .timeline-icon {
+  background: rgba(107, 87, 226, 0.14);
+}
+
+.timeline-item.spotlight .timeline-dot {
+  background: #f0b000;
+}
+
+.timeline-item.spotlight .timeline-date {
+  color: #bb8600;
+}
+
+.timeline-item.spotlight .timeline-icon {
+  background: rgba(253, 222, 91, 0.3);
+}
+
+.timeline-item.coordination .timeline-dot {
+  background: #68a88b;
+}
+
+.timeline-item.coordination .timeline-date {
+  color: #3d7f62;
+}
+
+.timeline-item.coordination .timeline-icon {
+  background: rgba(104, 168, 139, 0.18);
+}
+
+.timeline-item.ai .timeline-dot {
+  background: #bf1f1f;
+}
+
+.timeline-item.ai .timeline-date {
+  color: #a01212;
+}
+
+.timeline-item.ai .timeline-icon {
+  background: rgba(170, 0, 0, 0.1);
+}
+
 .timeline-main h4 {
   margin: 8px 0 0;
   font-size: clamp(1.35rem, 2.2vw, 2.2rem);
