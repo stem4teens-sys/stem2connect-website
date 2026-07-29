@@ -29,6 +29,7 @@
     <ul class="nav-links" id="navLinks">
       <li><a href="/">Home</a></li>
       <li><a href="/resources/">Resources</a></li>
+      <li><a href="#games">Games</a></li>
       <li><a href="#newsletter-archive">Archive</a></li>
       <li><a href="#journal">Journal</a></li>
       <li><a href="#coming-soon">Coming Soon</a></li>
@@ -422,6 +423,94 @@
       </div>
     </section>
 
+    <section class="section resources-games-section" id="games" aria-labelledby="games-title">
+      <div class="container">
+        <div class="section-heading centered">
+          <p class="section-label">STEM Challenge</p>
+          <h2 id="games-title">Organic Chemistry Wordle</h2>
+          <p>Practice essential chemistry vocabulary through a simple six-guess challenge designed for curiosity and confidence.</p>
+        </div>
+
+        <div class="game-shell">
+          <div class="game-main">
+            <div class="game-header">
+              <div>
+                <p class="game-eyebrow">Subject</p>
+                <h3>Organic Chemistry</h3>
+              </div>
+              <button class="button button-secondary" id="newWordButton" type="button">New Word</button>
+            </div>
+
+            <div class="game-status" id="gameStatus" aria-live="polite">Loading the next challenge...</div>
+            <div class="wordle-board" id="wordleBoard" aria-label="Wordle board"></div>
+
+            <div class="keyboard" id="keyboard" aria-label="On-screen keyboard">
+              <div class="keyboard-row">
+                <button type="button" data-key="Q">Q</button>
+                <button type="button" data-key="W">W</button>
+                <button type="button" data-key="E">E</button>
+                <button type="button" data-key="R">R</button>
+                <button type="button" data-key="T">T</button>
+                <button type="button" data-key="Y">Y</button>
+                <button type="button" data-key="U">U</button>
+                <button type="button" data-key="I">I</button>
+                <button type="button" data-key="O">O</button>
+                <button type="button" data-key="P">P</button>
+              </div>
+              <div class="keyboard-row">
+                <button type="button" data-key="A">A</button>
+                <button type="button" data-key="S">S</button>
+                <button type="button" data-key="D">D</button>
+                <button type="button" data-key="F">F</button>
+                <button type="button" data-key="G">G</button>
+                <button type="button" data-key="H">H</button>
+                <button type="button" data-key="J">J</button>
+                <button type="button" data-key="K">K</button>
+                <button type="button" data-key="L">L</button>
+              </div>
+              <div class="keyboard-row keyboard-actions">
+                <button type="button" data-key="Enter">Enter</button>
+                <button type="button" data-key="Z">Z</button>
+                <button type="button" data-key="X">X</button>
+                <button type="button" data-key="C">C</button>
+                <button type="button" data-key="V">V</button>
+                <button type="button" data-key="B">B</button>
+                <button type="button" data-key="N">N</button>
+                <button type="button" data-key="M">M</button>
+                <button type="button" data-key="Backspace">⌫</button>
+              </div>
+            </div>
+          </div>
+
+          <aside class="game-sidebar">
+            <div class="sidebar-card">
+              <p class="sidebar-label">Game Details</p>
+              <ul>
+                <li><strong>Subject:</strong> Organic Chemistry</li>
+                <li><strong>Difficulty:</strong> Beginner</li>
+                <li><strong>Attempts:</strong> Six guesses</li>
+              </ul>
+            </div>
+
+            <div class="sidebar-card">
+              <p class="sidebar-label">How to Play</p>
+              <ul>
+                <li>Guess the hidden organic chemistry term in six attempts.</li>
+                <li>Green means the letter is correct and in the right place.</li>
+                <li>Orange means the letter is in the word but in the wrong place.</li>
+                <li>Gray means the letter is not in the word.</li>
+              </ul>
+            </div>
+
+            <div class="sidebar-card">
+              <p class="sidebar-label">Challenge Details</p>
+              <div id="challengeDetails"></div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
     <section class="section resources-coming-soon" id="coming-soon" aria-labelledby="coming-soon-title">
       <div class="container section-heading centered">
         <p class="section-label">Coming Soon</p>
@@ -460,5 +549,6 @@
   </footer>
 
   <script src="../script.js"></script>
+  <script src="../games/src/wordle-game.js"></script>
 </body>
 </html>

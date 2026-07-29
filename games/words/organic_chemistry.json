@@ -1,0 +1,50 @@
+[
+  {
+    "word": "ESTER",
+    "definition": "A functional group formed from the reaction of a carboxylic acid and an alcohol.",
+    "importance": "Esters are widely used in fragrances, pharmaceuticals, and organic synthesis.",
+    "relatedTopics": ["Carboxylic Acids", "Alcohols", "Fischer Esterification"]
+  },
+  {
+    "word": "ALKANE",
+    "definition": "A hydrocarbon containing only single bonds between carbon atoms.",
+    "importance": "Alkanes are the simplest organic molecules and are used as fuels and solvents.",
+    "relatedTopics": ["Hydrocarbons", "Combustion", "Isomerism"]
+  },
+  {
+    "word": "ALKENE",
+    "definition": "A hydrocarbon that contains at least one carbon-carbon double bond.",
+    "importance": "Alkenes are important in polymer chemistry and industrial manufacturing.",
+    "relatedTopics": ["Unsaturation", "Polymers", "Addition Reactions"]
+  },
+  {
+    "word": "AMIDE",
+    "definition": "An organic compound containing a carbonyl group attached to a nitrogen atom.",
+    "importance": "Amides are essential in proteins, pharmaceuticals, and synthetic materials.",
+    "relatedTopics": ["Proteins", "Peptides", "Carboxylic Acids"]
+  },
+  {
+    "word": "KETONE",
+    "definition": "An organic compound in which a carbonyl carbon is bonded to two carbon atoms.",
+    "importance": "Ketones are used in solvents, medicines, and flavor chemistry.",
+    "relatedTopics": ["Aldehydes", "Oxidation", "Solvents"]
+  },
+  {
+    "word": "PHENOL",
+    "definition": "An aromatic compound with a hydroxyl group attached directly to a benzene ring.",
+    "importance": "Phenols are used in disinfectants, plastics, and medicinal chemistry.",
+    "relatedTopics": ["Aromaticity", "Benzene", "Antiseptics"]
+  },
+  {
+    "word": "BENZENE",
+    "definition": "A six-membered aromatic hydrocarbon with alternating double bonds.",
+    "importance": "Benzene is a core building block for dyes, medicines, and plastics.",
+    "relatedTopics": ["Aromatic Compounds", "Resonance", "Substitution Reactions"]
+  },
+  {
+    "word": "POLYMER",
+    "definition": "A large molecule made by joining many smaller repeating units called monomers.",
+    "importance": "Polymers shape modern materials such as plastics, fibers, and rubbers.",
+    "relatedTopics": ["Monomers", "Synthetic Materials", "Bioplastics"]
+  }
+]
