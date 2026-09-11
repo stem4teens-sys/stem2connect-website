@@ -1,0 +1,25 @@
+/* Occupy only the existing spare space beyond the fixed-width homepage hero. */
+.world-observatory { display: none; }
+@media (min-width: 1680px) and (hover: hover) and (pointer: fine) {
+  .world-observatory {
+    display: block;
+    position: absolute;
+    left: 1257px;
+    right: clamp(24px, 2.5vw, 72px);
+    top: 50%;
+    height: min(920px, calc(100% - 72px));
+    transform: translateY(-50%);
+    z-index: 1;
+    opacity: 0;
+    cursor: grab;
+    touch-action: pan-y;
+    border-radius: 45%;
+    transition: opacity 1s ease;
+  }
+  .world-observatory.is-ready { opacity: 1; }
+  .world-observatory:active { cursor: grabbing; }
+  .world-observatory:focus-visible { outline: 2px solid rgba(170,0,0,.45); outline-offset: -12px; }
+  .observatory-canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; pointer-events: none; }
+}
+@media (prefers-reduced-motion: reduce) { .world-observatory { transition: none; } }
+@media print { .world-observatory { display: none !important; } }
