@@ -54,10 +54,6 @@ if (isResourcesPage) {
 }
 
 
-const revealElements = document.querySelectorAll(
-  ".section-heading, .value-card, .activity-card, .webinar-card, .team-card, .mission-card, .upcoming-showcase, .timeline-item, .join-card, .testimonial-card, .social-card"
-);
-
 function extractYouTubeVideoId(embedSrc) {
   if (!embedSrc) return null;
 
@@ -274,31 +270,13 @@ youtubeIframes.forEach((iframe) => {
   }
 });
 
-revealElements.forEach((element) => {
-  element.classList.add("reveal");
-});
-
-const revealObserver = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("visible");
-        revealObserver.unobserve(entry.target);
-      }
-    });
-  },
-  {
-    threshold: 0.12
-  }
-);
-
-revealElements.forEach((element) => revealObserver.observe(element));
+// Entrance animations are provided by motion.js.
 
 // Smooth 'Back to top' behavior: override anchor and scroll to very top.
 const backToTopLink = document.querySelector('a[href="#top"]');
 if (backToTopLink) {
   backToTopLink.addEventListener('click', (e) => {
     e.preventDefault();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
   });
 }

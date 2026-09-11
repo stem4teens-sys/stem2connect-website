@@ -1,0 +1,306 @@
+/* Typography and motion only. Original layout/spacing remains in styles.css. */
+@font-face {
+  font-family: "Cabinet Grotesk";
+  src: url("assets/fonts/cabinet-variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "General Sans";
+  src: url("assets/fonts/general-variable.woff2") format("woff2");
+  font-weight: 200 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Space Grotesk";
+  src: url("assets/fonts/space-variable.woff2") format("woff2");
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("assets/fonts/mono-400.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("assets/fonts/mono-600.woff2") format("woff2");
+  font-weight: 500 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --motion-ease: cubic-bezier(.16, 1, .3, 1);
+  --motion-accent: #aa0000;
+  --motion-glow: 170, 0, 0;
+  --type-gradient: linear-gradient(115deg, #aa0000 8%, #cb4820 45%, #8b1424 75%, #aa0000);
+  --scroll-progress: 0;
+}
+body {
+  font-family: "General Sans", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-kerning: normal;
+}
+h1, h2, h3, h4, .brand, .social-card strong {
+  font-family: "Cabinet Grotesk", system-ui, sans-serif;
+  font-weight: 800;
+}
+.hero h1, .section-heading h2, .two-column h2, .join-card h2, .contact-grid h2 {
+  letter-spacing: -.035em;
+}
+.nav-links a, .button { font-weight: 650; }
+@media (min-width: 781px) and (max-width: 1100px) {
+  .nav-links a { font-size: .84rem; }
+}
+.brand { font-weight: 850; }
+.eyebrow, .section-label, .tag, .team-role, .timeline-date {
+  font-weight: 650;
+}
+.value-number, .timeline-date, .track-id { font-variant-numeric: tabular-nums; }
+
+body.hackathon-page {
+  --motion-accent: #d8ff37;
+  --motion-glow: 76, 244, 220;
+  --type-gradient: linear-gradient(110deg, #d8ff37 8%, #a9f68c 38%, #4cf4dc 66%, #d8ff37 95%);
+}
+.hackathon-page :is(h1, h2, h3, h4, .brand, footer a, .core span) {
+  font-family: "Space Grotesk", system-ui, sans-serif;
+  font-weight: 600;
+}
+.hackathon-page h1 { font-size: clamp(3rem, 6.5vw, 7.8rem); letter-spacing: -.045em; }
+.hackathon-page h2 { letter-spacing: -.055em; }
+.hackathon-page h3 { letter-spacing: -.03em; }
+.hackathon-page :is(nav, .signal, .section-kicker, .button, .node, .scroll-cue,
+  .track-id, .panel-label, .ai-line, footer, .timeline > li > span,
+  .principles b, .deliverable-grid article > span) {
+  font-family: "IBM Plex Mono", monospace;
+}
+.hackathon-page .brand { font-weight: 700; }
+.hackathon-page .after { --type-gradient: linear-gradient(110deg, #070809, #294023, #070809); }
+
+/* Words remain real, selectable text; whitespace and existing emphasis are kept. */
+.motion-word { display: inline-block; transform-origin: 0 100%; }
+h1 .motion-word, h2 .motion-word, h3 .motion-word, h4 .motion-word {
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+}
+.ink-gradient {
+  color: var(--motion-accent);
+  background: var(--type-gradient);
+  background-size: 220% 100%;
+  background-position: var(--ink-position, 0%) 50%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+::selection { background: #fdde5b; color: #201719; }
+.hackathon-page ::selection { background: #d8ff37; color: #070809; }
+
+/* Reveals are progressive enhancement: all content is visible without JS. */
+.reveal, .reveal.visible { opacity: 1; transform: none; transition: none; }
+.motion-pending { opacity: 0; }
+.motion-pending:focus-within { opacity: 1; }
+.motion-surface {
+  position: relative;
+  isolation: isolate;
+  transform-style: flat;
+  transition: box-shadow .45s var(--motion-ease), border-color .35s ease,
+    transform .65s var(--motion-ease);
+}
+.motion-surface::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(460px circle at var(--pointer-x, 50%) var(--pointer-y, 50%),
+    rgba(var(--motion-glow), .07), transparent 65%);
+  box-shadow: inset 0 0 0 1px rgba(var(--motion-glow), .24);
+  transition: opacity .45s ease;
+}
+.motion-surface:is(:hover, :focus-within)::after { opacity: 1; }
+.motion-surface img {
+  transition: transform .75s var(--motion-ease), filter .6s ease;
+}
+.motion-surface:hover :is(.team-avatar, .collab-logo, .highlight-icon-img, .activity-icon) {
+  transform: rotate(-5deg) scale(1.06);
+}
+.button, .nav-cta, .nav-toggle {
+  position: relative;
+  isolation: isolate;
+  transition: transform .5s var(--motion-ease), box-shadow .4s ease,
+    background .3s ease, color .3s ease;
+}
+.button::after, .nav-cta::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(110deg, transparent 20%, rgba(255,255,255,.28) 47%, transparent 72%);
+  background-size: 260% 100%;
+  background-position: 120% 0;
+  opacity: 0;
+  transition: background-position .8s var(--motion-ease), opacity .25s;
+}
+.button:is(:hover,:focus-visible)::after, .nav-cta:is(:hover,:focus-visible)::after {
+  background-position: -30% 0;
+  opacity: 1;
+}
+.button:active, .nav-cta:active { scale: .97; }
+.keyboard button { transition: scale .18s var(--motion-ease), background .2s, color .2s; }
+.keyboard button:active { scale: .9; }
+a:not(.button):not(.brand):not(.motion-surface) {
+  text-decoration-color: transparent;
+  text-underline-offset: .25em;
+  transition: color .25s, text-decoration-color .25s, background .25s;
+}
+a:not(.button):not(.brand):not(.motion-surface):hover { text-decoration-color: currentColor; }
+:is(a,button):focus-visible, .nav-links a:focus-visible, .button:focus-visible {
+  outline: 2px solid var(--motion-accent);
+  outline-offset: 5px;
+}
+.site-header::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 2px;
+  background: linear-gradient(90deg, #aa0000, #fdde5b, #00bf62);
+  transform-origin: left;
+  transform: scaleX(var(--scroll-progress));
+  pointer-events: none;
+}
+.hackathon-page .site-header::after { background: var(--type-gradient); }
+
+/* Independent depth layers use individual transform properties to compose with reveals. */
+.hero-bg-shape, .grid-field, .apply-grid {
+  translate: 0 var(--layer-y, 0px);
+  rotate: var(--layer-rotate, 0deg);
+}
+.hero-card, .hero-logo, .hero-content, .hero-copy, .machine {
+  translate: var(--depth-x, 0px) var(--depth-y, 0px);
+}
+.hero-logo { rotate: var(--logo-angle, 0deg); }
+.hero-signal-canvas, .orbital-canvas, .meteor-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.hero-signal-canvas { z-index: 0; opacity: .7; }
+.meteor-canvas { z-index: 3; }
+.hackathon-page .hero { isolation: isolate; }
+.hackathon-page .grid-field {
+  background-position: var(--grid-x, 0px) var(--grid-y, 0px);
+  opacity: .42;
+}
+.grid-field::after, .apply-grid::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(300px circle at var(--field-x, 65%) var(--field-y, 40%),
+    rgba(76,244,220,.17), transparent 80%);
+}
+.machine { perspective: 900px; }
+.machine .orbit-one { transform: rotateX(62deg) rotateZ(var(--orbit-angle, -28deg)); }
+.machine .orbit-two { transform: rotateY(58deg) rotateZ(var(--orbit-angle, 52deg)); }
+.machine .core { rotate: var(--core-angle, 0deg); transition: box-shadow .4s; }
+.machine .core span { rotate: calc(-1 * var(--core-angle, 0deg)); }
+.machine .node { translate: var(--node-x, 0px) var(--node-y, 0px); z-index: 2; }
+.machine.has-webgl { border-color: transparent; }
+.machine.has-webgl .orbit { opacity: .12; }
+.machine.has-webgl .core { background: rgba(7,8,9,.75); border-color: rgba(216,255,55,.35); }
+.orbital-canvas { z-index: 0; }
+.machine .core { z-index: 1; }
+.signal span { animation: signal-pulse 3.6s ease-in-out infinite; }
+.scroll-cue span { display: inline-block; animation: scroll-nudge 2.8s ease-in-out infinite; }
+.intro-skip {
+  position: absolute;
+  right: 20px;
+  top: 16px;
+  z-index: 4;
+  padding: 7px 12px;
+  border: 1px solid #4cf4dc;
+  background: #070809;
+  color: #f3f6ee;
+  font: 11px "IBM Plex Mono", monospace;
+  cursor: pointer;
+}
+
+/* The original list heights/gaps are retained: no spacer or pinned viewport. */
+@media (prefers-reduced-motion: no-preference) {
+  .stack-enabled > .stack-card {
+    position: sticky;
+    top: calc(var(--header-height, 76px) + 18px + var(--stack-index, 0) * 12px);
+    z-index: calc(5 + var(--stack-index, 0));
+    transform-origin: center top;
+  }
+  .hackathon-page .timeline.stack-enabled > li {
+    background: var(--panel);
+    box-shadow: 0 -1px 0 var(--line), 0 -15px 24px -24px #000;
+  }
+  .stack-enabled:focus-within > .stack-card { position: relative; top: auto; transform: none !important; }
+}
+.timeline > li > span { transition: color .3s, text-shadow .3s; }
+.timeline > li.is-current > span { color: var(--acid); text-shadow: 0 0 18px #d8ff3766; }
+.track-grid article { overflow: hidden; }
+.track-motif {
+  position: absolute;
+  right: 12px;
+  top: 16px;
+  width: 86px;
+  height: 86px;
+  color: var(--cyan);
+  opacity: .16;
+  pointer-events: none;
+  transition: opacity .4s, transform .8s var(--motion-ease);
+}
+.track-motif path, .track-motif circle, .track-motif ellipse {
+  fill: none; stroke: currentColor; stroke-width: 1;
+  stroke-dasharray: 180; stroke-dashoffset: var(--motif-offset, 70);
+  transition: stroke-dashoffset 1.2s var(--motion-ease);
+}
+.track-grid article:is(:hover, :focus-within) .track-motif {
+  opacity: .8; transform: rotate(-10deg); --motif-offset: 0;
+}
+@keyframes signal-pulse { 50% { box-shadow: 0 0 22px var(--acid); opacity: .45; } }
+@keyframes scroll-nudge { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(5px); } }
+@media (hover: none), (pointer: coarse) {
+  .motion-surface { transform: none !important; }
+}
+@media (max-width: 780px) {
+  /* A backdrop-filter would contain the fixed mobile menu inside the header. */
+  .site-header { backdrop-filter: none; }
+  .nav-links { visibility: hidden; transition: transform .5s var(--motion-ease), visibility .5s; }
+  .nav-links.active { visibility: visible; }
+}
+@media (max-width: 640px) {
+  body:not(.hackathon-page) .hero h1 { font-size: clamp(2.5rem, 10.5vw, 3.4rem); }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .motion-pending { opacity: 1 !important; }
+  .motion-word, .motion-surface { transform: none !important; }
+  .hero-bg-shape, .grid-field, .apply-grid, .hero-card, .hero-logo,
+  .hero-content, .hero-copy, .machine, .machine .node { translate: none; rotate: none; }
+  .hero-signal-canvas, .orbital-canvas, .meteor-canvas, .intro-skip { display: none; }
+  .machine.has-webgl .orbit { opacity: 1; }
+  .machine.has-webgl { border-color: #34413d; }
+}
+@media print {
+  .motion-pending { opacity: 1 !important; }
+  .hero-signal-canvas, .orbital-canvas, .meteor-canvas, .intro-skip { display: none; }
+  .stack-enabled > .stack-card { position: static; transform: none !important; }
+}
