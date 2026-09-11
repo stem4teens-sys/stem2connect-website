@@ -5,19 +5,25 @@ import { createStudents } from './globe-students.js?v=3';
 
 export async function mountObservatory(host, reduced, signal) {
   // Decoded, pre-baked textures avoid parsing geography and painting canvases during startup.
-  const loadImage = async name => {
-    const response = await fetch(new URL(name, host.assetBase || new URL('./assets/models/', import.meta.url)), { signal });
-    if (!response.ok) throw new Error('Globe texture unavailable');
-    const blob = await response.blob();
+  const loadImage = async (name, index) => {
+    let blob;
+    if (host.textureBytes) {
+      const buffers = await host.textureBytes;
+      blob = new Blob([buffers[index]], { type: 'image/webp' });
+    } else {
+      const response = await fetch(new URL(name, host.assetBase || new URL('./assets/models/', import.meta.url)), { signal });
+      if (!response.ok) throw new Error('Globe texture unavailable');
+      blob = await response.blob();
+    }
     return createImageBitmap(blob, { imageOrientation: 'flipY' });
   };
-  const images = await Promise.allSettled([loadImage('earth-color.webp'), loadImage('earth-relief.webp')]);
-  if (signal.aborted || !host.isConnected || images.some(image => image.status === 'rejected')) {
-    images.forEach(image => { if (image.status === 'fulfilled') image.value.close(); });
-    return;
-  }
+  // Network, geometry and shader work can proceed together. Do not put the GPU
+  // behind the texture downloads; the complete scene is still shown atomically.
+  const imageRequest = Promise.allSettled([loadImage('earth-color.webp', 0), loadImage('earth-relief.webp', 1)]);
+  let images = [], disposed = false;
+  const closeImages = () => images.forEach(image => { if (image.status === 'fulfilled') image.value.close(); });
   const stage = createStage(host, 'observatory-canvas', reduced);
-  if (!stage) { images.forEach(image => image.value.close()); return; }
+  if (!stage) { imageRequest.then(results => { images = results; closeImages(); }); return; }
   const { scene, camera, renderer } = stage;
   // One CSS pixel per drawing pixel is ample here; avoid a multi-megapixel retina canvas.
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -29,9 +35,10 @@ export async function mountObservatory(host, reduced, signal) {
   fillLight.position.set(4, -1, 5); scene.add(fillLight);
   const textures = [];
   const texture = (image, color = true) => {
-    const map = image instanceof ImageBitmap ? new THREE.Texture(image) : new THREE.CanvasTexture(image);
+    const map = !image || image instanceof ImageBitmap ? new THREE.Texture(image) : new THREE.CanvasTexture(image);
     map.colorSpace = color ? THREE.SRGBColorSpace : THREE.NoColorSpace;
-    map.anisotropy = 2; map.needsUpdate = true;
+    map.anisotropy = 2;
+    if (image) map.needsUpdate = true;
     textures.push(map); return map;
   };
 
@@ -96,8 +103,8 @@ export async function mountObservatory(host, reduced, signal) {
   const earthSystem = new THREE.Group(); cradle.add(earthSystem);
   const earthMaterial = material(0xffffff, 0, .95);
   earthMaterial.specular.setHex(0x242019);
-  earthMaterial.map = texture(images[0].value);
-  earthMaterial.bumpMap = texture(images[1].value, false);
+  earthMaterial.map = texture(null);
+  earthMaterial.bumpMap = texture(null, false);
   earthMaterial.bumpScale = .012;
   mesh(new THREE.SphereGeometry(1.63, 64, 40), earthMaterial, earthSystem);
   const coordinate = (latitude, longitude, radius = 1.65) => {
@@ -199,13 +206,26 @@ export async function mountObservatory(host, reduced, signal) {
   };
   stage.resize();
   stage.onDispose(()=>{
+    disposed = true;
     Object.entries(listeners).forEach(([event,fn])=>host.removeEventListener(event,fn));
     earthSystem.traverse(object=>{if(object.isInstancedMesh)object.dispose();});
     textures.forEach(map=>map.dispose());
-    images.forEach(image=>image.value.close());
+    closeImages();
   });
   batchStaticMeshes(model);
-  await stage.start();
+  const prepareTextures = imageRequest.then(results => {
+    images = results;
+    if (disposed) { closeImages(); throw new Error('Globe disposed during texture loading'); }
+    if (signal.aborted || !host.isConnected || images.some(image => image.status === 'rejected')) {
+      stage.dispose(); throw new Error('Globe textures unavailable');
+    }
+    [earthMaterial.map, earthMaterial.bumpMap].forEach((map, index) => {
+      map.image = images[index].value;
+      map.needsUpdate = true;
+      renderer.initTexture(map);
+    });
+  });
+  await stage.start(prepareTextures);
   if (signal.aborted || !host.isConnected) { stage.dispose(); return; }
   return stage.dispose;
 }

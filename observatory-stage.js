@@ -51,12 +51,15 @@ export function createStage(host, className, reduced) {
     if (host.visible) { renderOnce(); resume(); }
   };
   host.addEventListener('resize', size); host.addEventListener('visibility', visibility);
-  async function start() {
+  async function start(preparation = Promise.resolve()) {
     size();
     try {
-      const compilation = renderer.compileAsync(scene, camera);
-      renderer.getContext().flush();
-      await compilation;
+      const compilation = Promise.resolve().then(() => {
+        const pending = renderer.compileAsync(scene, camera);
+        renderer.getContext().flush();
+        return pending;
+      });
+      await Promise.all([compilation, preparation]);
       if (stopped) return false;
       ready = true; renderOnce(); resume(); return true;
     } catch (error) { dispose(); throw error; }

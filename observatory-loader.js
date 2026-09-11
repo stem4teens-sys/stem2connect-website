@@ -1,6 +1,8 @@
 /* The globe and its data are requested only where the desktop hero has spare room. */
+import { mountObservatory } from './observatory-client.js';
+
 (() => {
-  const source = document.currentScript.src;
+  const source = import.meta.url;
   const hero = document.querySelector('#home.hero');
   if (!hero) return;
   const wide = matchMedia('(min-width: 1680px) and (hover: hover) and (pointer: fine)');
@@ -58,9 +60,8 @@
       if (signal.aborted) return;
       await whenVisible(element, signal);
       if (signal.aborted) return;
-      const module = await import(new URL('observatory-client.js?v=5', source).href);
       if (current !== generation) return;
-      const dispose = await module.mountObservatory(element, reduced, signal);
+      const dispose = await mountObservatory(element, reduced, signal);
       if (current !== generation) { dispose?.(); return; }
       cleanup = dispose;
       if (dispose) element.classList.add('is-ready');

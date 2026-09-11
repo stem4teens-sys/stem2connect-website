@@ -13,9 +13,10 @@ export async function mountObservatory(host, reduced, signal) {
   try { surface = canvas.transferControlToOffscreen(); }
   catch { canvas.remove(); makeStatic(); return () => {}; }
   let worker;
-  try { worker = new Worker(new URL('./assets/runtime/observatory-worker.js?v=5', import.meta.url), { type: 'module' }); }
+  try { worker = new Worker(new URL('./assets/runtime/observatory-worker.js?v=6', import.meta.url), { type: 'module' }); }
   catch { canvas.remove(); makeStatic(); return () => {}; }
   let stopped = false, inView = true, pointerFrame = 0, pointer, scrollFrame = 0, startup;
+  const textureRequest = new AbortController();
   const send = data => { if (!stopped) worker.postMessage(data); };
   const visibility = () => send({ type: 'visibility', visible: inView && !document.hidden });
   const resize = new ResizeObserver(() => send({ type: 'resize', width: host.clientWidth, height: host.clientHeight }));
@@ -40,7 +41,7 @@ export async function mountObservatory(host, reduced, signal) {
   const events = ['pointerdown','pointerup','pointercancel','pointerleave','focus','blur','keydown'];
   const dispose = () => {
     if (stopped) return;
-    stopped = true; clearTimeout(startup); worker.terminate(); resize.disconnect(); observer.disconnect();
+    stopped = true; clearTimeout(startup); textureRequest.abort(); worker.terminate(); resize.disconnect(); observer.disconnect();
     cancelAnimationFrame(pointerFrame); cancelAnimationFrame(scrollFrame);
     events.forEach(name => host.removeEventListener(name, input)); host.removeEventListener('pointermove', move);
     document.removeEventListener('visibilitychange', visibility); window.removeEventListener('scroll', scroll);
@@ -61,7 +62,16 @@ export async function mountObservatory(host, reduced, signal) {
     }
     else if (data.type === 'unavailable') unavailable();
   });
-  worker.postMessage({ type: 'init', canvas: surface, assetBase: new URL('./assets/models/', import.meta.url).href, width: host.clientWidth, height: host.clientHeight, visible: !document.hidden, reduced: reduced.matches }, [surface]);
+  worker.postMessage({ type: 'init', canvas: surface, transferTextures: true, width: host.clientWidth, height: host.clientHeight, visible: !document.hidden, reduced: reduced.matches }, [surface]);
+  // Start these requests while the worker and its engine are downloading.
+  // Transfer the small compressed files once; decoding stays in the worker.
+  Promise.all(['earth-color.webp', 'earth-relief.webp'].map(async name => {
+    const response = await fetch(new URL(`./assets/models/${name}`, import.meta.url), { signal: textureRequest.signal });
+    if (!response.ok) throw new Error('Globe texture unavailable');
+    return response.arrayBuffer();
+  })).then(buffers => {
+    if (!stopped) worker.postMessage({ type: 'textures', buffers }, buffers);
+  }).catch(() => { if (!stopped) unavailable(); });
   events.forEach(name => host.addEventListener(name, input)); host.addEventListener('pointermove', move, { passive: true });
   document.addEventListener('visibilitychange', visibility); window.addEventListener('scroll', scroll, { passive: true });
   resize.observe(host); observer.observe(host); signal.addEventListener('abort', dispose, { once: true });

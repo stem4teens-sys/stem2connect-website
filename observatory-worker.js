@@ -6,14 +6,17 @@ class SceneHost extends EventTarget {
   setPointerCapture() {}
   getBoundingClientRect() { return { left: 0, top: 0, width: this.width, height: this.height }; }
 }
-let host, cleanup;
+let host, cleanup, receiveTextures;
 self.addEventListener('message', async ({ data }) => {
   if (data.type === 'init') {
     host = new SceneHost(); Object.assign(host, data);
+    if (data.transferTextures) host.textureBytes = new Promise(resolve => { receiveTextures = resolve; });
     try {
       cleanup = await mountObservatory(host, { matches: data.reduced }, new AbortController().signal);
       self.postMessage({ type: cleanup ? 'ready' : 'unavailable' });
     } catch { self.postMessage({ type: 'unavailable' }); }
+  } else if (data.type === 'textures') {
+    receiveTextures?.(data.buffers); receiveTextures = undefined;
   } else if (data.type === 'input' && host) {
     const event = new Event(data.name, { cancelable: true }); Object.assign(event, data.properties);
     host.dispatchEvent(event);
