@@ -362,6 +362,24 @@
     observer.observe(host); cleanups.push(() => observer.disconnect());
   }
   mountScenes();
+  // Margin artwork is optional and loads only after the page's initial load.
+  // It shares no renderer or assets with the globe and never loads on mobile.
+  const edgeViewport = matchMedia('(min-width: 1480px) and (hover: hover) and (pointer: fine)');
+  let edgesRequested = false;
+  const loadEdges = () => {
+    if (!edgeViewport.matches || edgesRequested) return;
+    edgesRequested = true;
+    const start = () => {
+      if (!edgeViewport.matches) { edgesRequested = false; return; }
+      import(new URL('assets/runtime/edge-decorations.js?v=1', scriptURL).href)
+        .then(module => module.mountEdgeDecorations()).catch(() => {});
+    };
+    if ('requestIdleCallback' in window) requestIdleCallback(start, { timeout: 1500 });
+    else setTimeout(start, 150);
+  };
+  if (document.readyState === 'complete') loadEdges();
+  else addEventListener('load', loadEdges, { once: true });
+  edgeViewport.addEventListener('change', () => { if (document.readyState === 'complete') loadEdges(); });
   reduced.addEventListener('change', () => {
     if (reduced.matches) {
       observer?.disconnect();

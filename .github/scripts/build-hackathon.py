@@ -19,6 +19,7 @@ SHARED = (
     "scene-client.js",
     "static-batches.js",
     "motion.js",
+    "edge-decorations.js",
     "polish.css",
     "orbital.js",
     "three-stage.js",
