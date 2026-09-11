@@ -10,12 +10,13 @@ export function createStage(host, className, reduced) {
   const callbacks = [];
   let stopped = false, ready = false, frame = 0, last = 0, elapsed = 0;
   let pixelBudget = 1100000, slowFrames = 0, interval = 1000 / 24;
-  const requestFrame = typeof requestAnimationFrame === 'function' ? requestAnimationFrame : fn => setTimeout(() => fn(performance.now()), 42);
-  const cancelFrame = typeof cancelAnimationFrame === 'function' ? cancelAnimationFrame : clearTimeout;
+  const requestFrame = fn => setTimeout(() => fn(performance.now()), interval);
+  const cancelFrame = clearTimeout;
   const stage = { scene, camera, renderer, draw: () => {}, resize: () => {}, renderOnce, start, dispose, onDispose: fn => callbacks.push(fn) };
   function renderOnce() {
     if (ready && !stopped && host.visible && !host.framePending) {
       renderer.render(scene, camera);
+      renderer.getContext().finish();
       host.framePending = true;
       const bitmap = host.canvas.transferToImageBitmap();
       self.postMessage({ type: 'frame', bitmap }, [bitmap]);
@@ -49,7 +50,7 @@ export function createStage(host, className, reduced) {
   async function start() {
     size();
     try {
-      await renderer.compileAsync(scene, camera);
+      renderer.compile(scene, camera);
       if (stopped) return false;
       ready = true; renderOnce(); resume(); return true;
     } catch (error) { dispose(); throw error; }

@@ -140,25 +140,28 @@
     element.classList.remove('motion-pending');
     element.dataset.motion = 'revealed';
     if (reduced.matches) return;
+    // Hero content stays readable throughout its entrance; only its movement animates.
+    const immediate = !!element.closest('.hero, .resources-hero, header');
+    const opacity = immediate ? 1 : 0;
     const rect = element.getBoundingClientRect();
     const delay = clamp(rect.left / innerWidth, 0, 1) * 110;
     const options = { duration: 780, delay, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'backwards' };
     if (/^H[12]$/.test(element.tagName)) {
       element.querySelectorAll('.motion-word').forEach((word, index) => {
         animate(word, [
-          { opacity: 0, transform: 'translateY(.65em) rotate(2deg)', clipPath: 'inset(0 0 100% 0)' },
+          { opacity, transform: 'translateY(.65em) rotate(2deg)', clipPath: immediate ? 'inset(-20% -10% -20% -10%)' : 'inset(0 0 100% 0)' },
           { opacity: 1, transform: 'translateY(0) rotate(0)', clipPath: 'inset(-20% -10% -20% -10%)' }
         ], { ...options, duration: 1000, delay: delay + Math.min(index * 40, 340) });
       });
     } else if (element.classList.contains('motion-surface')) {
       const nested = element.parentElement.closest('.motion-surface') || element.querySelector('.motion-surface');
-      animate(element, [{ opacity: .2, translate: nested ? '0 0' : '0 16px' }, { opacity: 1, translate: '0 0' }], options);
+      animate(element, [{ opacity: immediate ? 1 : .2, translate: nested ? '0 0' : '0 16px' }, { opacity: 1, translate: '0 0' }], options);
     } else if (element.matches('.section-label, .section-kicker, .track-id, .panel-label, .value-card > span')) {
-      animate(element, [{ opacity: 0, clipPath: 'inset(0 100% 0 0)' }, { opacity: 1, clipPath: 'inset(0 0 0 0)' }], { ...options, duration: 900 });
+      animate(element, [{ opacity, clipPath: 'inset(0 100% 0 0)' }, { opacity: 1, clipPath: 'inset(0 0 0 0)' }], { ...options, duration: 900 });
     } else if (element.tagName === 'IMG' || element.matches('.activity-icon, .highlight-icon, .node')) {
-      animate(element, [{ opacity: 0, scale: '.9', rotate: '-6deg' }, { opacity: 1, scale: '1', rotate: '0deg' }], options);
+      animate(element, [{ opacity, scale: '.9', rotate: '-6deg' }, { opacity: 1, scale: '1', rotate: '0deg' }], options);
     } else {
-      animate(element, [{ opacity: 0, translate: element.closest('.motion-surface') ? '0 0' : '0 9px' }, { opacity: 1, translate: '0 0' }], options);
+      animate(element, [{ opacity, translate: element.closest('.motion-surface') ? '0 0' : '0 9px' }, { opacity: 1, translate: '0 0' }], options);
     }
   };
 
@@ -340,16 +343,24 @@
   }, { passive: true });
   let sceneGeneration = 0;
   function mountScenes() {
-    if (reduced.matches) return;
+    if (reduced.matches || (!machine && !moleculeHost)) return;
     const generation = ++sceneGeneration;
-    const file = machine ? 'orbital.js?v=2' : moleculeHost ? 'sculptures.js?v=2' : null;
-    if (!file) return;
-    import(new URL(file, scriptURL).href).then(module => {
-      if (reduced.matches || generation !== sceneGeneration) return;
-      const cleanup = machine ? module.mountOrbital(machine, hero, reduced) : module.mountMolecules(moleculeHost, reduced);
-      if (cleanup) cleanups.push(cleanup);
-      requestUpdate();
-    }).catch(() => { /* Original artwork remains available without WebGL. */ });
+    const host = machine || moleculeHost;
+    const observer = new IntersectionObserver(entries => {
+      if (!entries[0].isIntersecting) return;
+      observer.disconnect();
+      // Yield to text and navigation without depending on animation-frame delivery.
+      setTimeout(() => {
+        if (reduced.matches || generation !== sceneGeneration) return;
+        Promise.allSettled([...animations].map(animation => animation.finished)).then(() =>
+          import(new URL('scene-client.js?v=4', scriptURL).href)).then(module => {
+          if (reduced.matches || generation !== sceneGeneration) return;
+          cleanups.push(module.mountScene(host, hero, machine ? 'orbital' : 'molecules', reduced));
+          requestUpdate();
+        }).catch(() => {});
+      }, 80);
+    });
+    observer.observe(host); cleanups.push(() => observer.disconnect());
   }
   mountScenes();
   reduced.addEventListener('change', () => {

@@ -11,18 +11,18 @@
     return new Promise(resolve => {
       let idle, timer;
       const finish = () => {
-        window.removeEventListener('load', queue);
+        window.removeEventListener('DOMContentLoaded', queue);
         document.removeEventListener('visibilitychange', queue);
         if (idle !== undefined) cancelIdleCallback(idle);
         clearTimeout(timer); signal.removeEventListener('abort', finish); resolve();
       };
       const queue = () => {
-        if (document.readyState !== 'complete' || document.hidden || idle !== undefined || timer) return;
+        if (document.readyState === 'loading' || document.hidden || idle !== undefined || timer) return;
         if ('requestIdleCallback' in window) idle = requestIdleCallback(finish, { timeout: 1000 });
         else timer = setTimeout(finish, 80);
       };
       signal.addEventListener('abort', finish, { once: true });
-      window.addEventListener('load', queue, { once: true });
+      window.addEventListener('DOMContentLoaded', queue, { once: true });
       document.addEventListener('visibilitychange', queue);
       queue();
     });
@@ -54,11 +54,18 @@
     element.append(poster);
     host = element; hero.append(element);
     try {
+      // Let the existing text entrance finish before sharing the GPU with 3D.
+      await new Promise(resolve => setTimeout(resolve, 1600));
+      if (signal.aborted) return;
+      const entrances = document.getAnimations().filter(animation =>
+        Number.isFinite(animation.effect?.getComputedTiming().endTime));
+      await Promise.allSettled(entrances.map(animation => animation.finished));
+      if (signal.aborted) return;
       await whenIdle(signal);
       if (signal.aborted) return;
       await whenVisible(element, signal);
       if (signal.aborted) return;
-      const module = await import(new URL('observatory-client.js?v=3', source).href);
+      const module = await import(new URL('observatory-client.js?v=4', source).href);
       if (current !== generation) return;
       const dispose = await module.mountObservatory(element, reduced, signal);
       if (current !== generation) { dispose?.(); return; }
@@ -66,7 +73,7 @@
       if (dispose) element.classList.add('is-ready');
       else element.remove();
     } catch (error) {
-      if (current === generation) element.remove();
+      if (current === generation) element.classList.add('is-ready', 'is-static');
       if (error.name !== 'AbortError') console.warn('Desktop globe could not be loaded. The website remains available.');
     }
   }

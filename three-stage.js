@@ -3,16 +3,16 @@ import * as THREE from './assets/vendor/three.module.min.js';
 // A small lifecycle shared by the two decorative scenes. Native scrolling stays untouched.
 export function createStage(host, className, reduced) {
   let renderer;
-  const coarse = matchMedia('(pointer: coarse)').matches;
+  const background = !!host.background;
+  const coarse = background ? host.coarse : matchMedia('(pointer: coarse)').matches;
+  let prepared = false, firstFrame = true;
   try {
-    renderer = new THREE.WebGLRenderer({ alpha: true, antialias: !coarse, powerPreference: 'low-power' });
+    renderer = new THREE.WebGLRenderer({ canvas: background ? host.canvas : undefined, alpha: true, antialias: !coarse, powerPreference: 'low-power' });
   } catch { return null; }
   renderer.setClearColor(0x000000, 0);
-  renderer.setPixelRatio(Math.min(devicePixelRatio, coarse ? 1.25 : 1.5));
+  renderer.setPixelRatio(Math.min(background ? host.dpr : devicePixelRatio, coarse ? 1 : 1.25));
   const canvas = renderer.domElement;
-  canvas.className = className;
-  canvas.setAttribute('aria-hidden', 'true');
-  host.prepend(canvas);
+  if (!background) { canvas.className = className; canvas.setAttribute('aria-hidden', 'true'); host.prepend(canvas); }
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(42, 1, .1, 50);
   camera.position.z = 6.8;
@@ -20,7 +20,7 @@ export function createStage(host, className, reduced) {
   const callbacks = [];
   let frame = 0, last = 0, elapsed = 0, visible = false, stopped = false;
   let slowFrames = 0, samples = 0;
-  const stage = { scene, camera, renderer, input, width: 1, height: 1, draw: () => {}, resize: () => {}, dispose, onDispose: fn => callbacks.push(fn) };
+  const stage = { scene, camera, renderer, input, width: 1, height: 1, draw: () => {}, resize: () => {}, start, dispose, onDispose: fn => callbacks.push(fn) };
   function resize() {
     if (stopped) return;
     stage.width = Math.max(1, host.clientWidth);
@@ -33,31 +33,38 @@ export function createStage(host, className, reduced) {
   }
   function draw(now) {
     frame = 0;
-    if (stopped || !visible || document.hidden || reduced.matches) { last = 0; return; }
+    if (stopped || !visible || (!background && document.hidden) || reduced.matches) { last = 0; return; }
     frame = requestAnimationFrame(draw);
-    if (last && now - last < 32) return;
+    if ((background && host.framePending) || (last && now - last < 32)) return;
     const dt = last ? Math.min((now - last) / 1000, .08) : 0;
     if (last && ++samples < 100 && now - last > 54) slowFrames++;
     if (samples === 100 && slowFrames > 25) renderer.setPixelRatio(1);
     last = now;
     elapsed += dt;
     stage.draw({ now, elapsed, dt });
-    if (!stopped) renderer.render(scene, camera);
+    if (!stopped) { renderer.render(scene, camera); if (background) renderer.getContext().finish(); host.present?.(); if (firstFrame) { firstFrame = false; host.onFrame?.(); } }
   }
-  function resume() { if (!frame && !stopped) frame = requestAnimationFrame(draw); }
-  const observer = new IntersectionObserver(entries => { visible = entries[0].isIntersecting; if (visible) resume(); }, { threshold: .08 });
-  const sizeObserver = new ResizeObserver(resize);
-  observer.observe(host); sizeObserver.observe(host);
+  function resume() { if (prepared && !frame && !stopped) frame = requestAnimationFrame(draw); }
+  const observer = background ? null : new IntersectionObserver(entries => { visible = entries[0].isIntersecting; if (visible) resume(); }, { threshold: .08 });
+  const sizeObserver = background ? null : new ResizeObserver(resize);
+  observer?.observe(host); sizeObserver?.observe(host);
   const receive = event => { Object.assign(input, event.detail); resume(); };
+  const visibility = () => { visible = background ? host.visible : !document.hidden; if (visible) resume(); };
   host.addEventListener('orbital-input', receive);
-  document.addEventListener('visibilitychange', resume);
+  if (background) { host.addEventListener('resize', resize); host.addEventListener('visibility', visibility); visible = host.visible; }
+  else document.addEventListener('visibilitychange', visibility);
+  async function start() {
+    renderer.compile(scene, camera);
+    if (!stopped) { prepared = true; resume(); }
+  }
   function dispose() {
     if (stopped) return;
     stopped = true;
     cancelAnimationFrame(frame);
-    observer.disconnect(); sizeObserver.disconnect();
+    observer?.disconnect(); sizeObserver?.disconnect();
     host.removeEventListener('orbital-input', receive);
-    document.removeEventListener('visibilitychange', resume);
+    if (background) { host.removeEventListener('resize', resize); host.removeEventListener('visibility', visibility); }
+    else document.removeEventListener('visibilitychange', visibility);
     callbacks.forEach(fn => fn());
     const resources = new Set();
     scene.traverse(object => {
@@ -65,7 +72,7 @@ export function createStage(host, className, reduced) {
       if (object.material) (Array.isArray(object.material) ? object.material : [object.material]).forEach(material => resources.add(material));
     });
     resources.forEach(resource => resource.dispose());
-    renderer.dispose(); canvas.remove();
+    renderer.dispose(); renderer.forceContextLoss(); if (!background) canvas.remove();
   }
   canvas.addEventListener('webglcontextlost', dispose, { once: true });
   resize();

@@ -5,7 +5,7 @@ import { createStudents } from './globe-students.js?v=3';
 export async function mountObservatory(host, reduced, signal) {
   // Decoded, pre-baked textures avoid parsing geography and painting canvases during startup.
   const loadImage = async name => {
-    const response = await fetch(new URL(`./assets/models/${name}`, import.meta.url), { signal });
+    const response = await fetch(new URL(name, host.assetBase || new URL('./assets/models/', import.meta.url)), { signal });
     if (!response.ok) throw new Error('Globe texture unavailable');
     const blob = await response.blob();
     return createImageBitmap(blob, { imageOrientation: 'flipY' });

@@ -1,7 +1,7 @@
 import * as THREE from './assets/vendor/three.module.min.js';
 import { createStage, lighting } from './three-stage.js';
 
-export function mountMolecules(host, reduced) {
+export async function mountMolecules(host, reduced) {
   const stage = createStage(host, 'molecular-canvas', reduced);
   if (!stage) return;
   lighting(stage.scene);
@@ -62,5 +62,6 @@ export function mountMolecules(host, reduced) {
     molecule.rotation.set(.24, elapsed * .12 + stage.input.scroll * .0015, -.22);
     helix.rotation.set(0, -elapsed * .13 + stage.input.scroll * .002, -.16);
   };
+  await stage.start();
   return stage.dispose;
 }

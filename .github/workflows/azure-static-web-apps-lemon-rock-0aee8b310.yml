@@ -24,6 +24,8 @@ jobs:
         with:
           submodules: true
           lfs: false
+      - name: Build visual enhancements
+        run: bash .github/scripts/build-effects.sh
       - name: Package hackathon and shared assets
         run: python3 .github/scripts/build-hackathon.py
       - name: Build And Deploy

@@ -1,7 +1,7 @@
 import * as THREE from './assets/vendor/three.module.min.js';
 import { createStage, lighting } from './three-stage.js';
 
-export function mountOrbital(machine, hero, reduced) {
+export async function mountOrbital(machine, hero, reduced) {
   const stage = createStage(machine, 'orbital-canvas', reduced);
   if (!stage) return;
   lighting(stage.scene);
@@ -65,9 +65,9 @@ export function mountOrbital(machine, hero, reduced) {
   }
   const impactRing = circle(.4, lineMaterial(acid, 0));
   let impactAt = 0, entranceCleanup, entered = false;
-  let introPlayed = false;
+  let introPlayed = hero.introPlayed || false;
   try { introPlayed = sessionStorage.getItem('stem2connect-orbit-intro-v2') === '1'; } catch { /* Optional persistence. */ }
-  if (new URLSearchParams(location.search).get('intro') === '1') introPlayed = false;
+  if (hero.forceIntro || new URLSearchParams(location.search).get('intro') === '1') introPlayed = false;
   function finishEntrance() { delete hero.dataset.intro; sculpture.scale.setScalar(1); }
   stage.draw = ({ now, elapsed }) => {
     if (!entered) {
@@ -100,17 +100,20 @@ export function mountOrbital(machine, hero, reduced) {
   };
   machine.classList.add('has-webgl');
   stage.onDispose(() => { entranceCleanup?.(); finishEntrance(); machine.classList.remove('has-webgl'); });
+  await stage.start();
   return stage.dispose;
 }
 
 // One short, skippable 3D entrance. The transparent overlay never intercepts navigation.
 function meteorEntrance(hero, machine, impact, finish) {
+  const background = !!hero.canvas;
+  const visibilitySource = background ? hero : document;
   let renderer;
-  try { renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false, powerPreference: 'low-power' }); }
+  try { renderer = new THREE.WebGLRenderer({ canvas: background ? hero.canvas : undefined, alpha: true, antialias: false, powerPreference: 'low-power' }); }
   catch { finish(); return () => {}; }
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.25));
-  const canvas = renderer.domElement; canvas.className = 'meteor-canvas'; canvas.setAttribute('aria-hidden', 'true');
-  const skip = document.createElement('button'); skip.type = 'button'; skip.className = 'intro-skip'; skip.textContent = 'Skip animation';
+  renderer.setPixelRatio(Math.min(background ? hero.dpr : devicePixelRatio, 1));
+  const canvas = renderer.domElement; if (!background) { canvas.className = 'meteor-canvas'; canvas.setAttribute('aria-hidden', 'true'); }
+  const skip = background ? hero.skip : document.createElement('button'); skip.type = 'button'; skip.className = 'intro-skip'; skip.textContent = 'Skip animation';
   hero.append(canvas, skip); hero.dataset.intro = 'flight';
   const width = hero.clientWidth, height = hero.clientHeight;
   renderer.setSize(width, height, false);
@@ -126,14 +129,14 @@ function meteorEntrance(hero, machine, impact, finish) {
   function cleanup() {
     if (stopped) return;
     stopped = true; cancelAnimationFrame(raf); finish();
-    const focused = document.activeElement === skip;
+    const focused = !background && document.activeElement === skip;
     scene.traverse(object => { object.geometry?.dispose(); object.material?.dispose(); });
-    renderer.dispose(); canvas.remove(); skip.remove();
-    document.removeEventListener('visibilitychange', visibility);
+    renderer.dispose(); renderer.forceContextLoss(); if (!background) canvas.remove(); skip.remove();
+    visibilitySource.removeEventListener('visibilitychange', visibility);
     if (focused) hero.querySelector('a')?.focus({ preventScroll: true });
   }
-  function visibility() { if (document.hidden) cleanup(); }
-  document.addEventListener('visibilitychange', visibility);
+  function visibility() { if (visibilitySource.hidden) cleanup(); }
+  visibilitySource.addEventListener('visibilitychange', visibility);
   skip.addEventListener('click', cleanup);
   function draw(now) {
     if (stopped) return;
@@ -141,7 +144,7 @@ function meteorEntrance(hero, machine, impact, finish) {
     if (age > 1950) { cleanup(); return; }
     const bounds = hero.getBoundingClientRect(), targetBounds = machine.getBoundingClientRect();
     const target = new THREE.Vector3(targetBounds.left - bounds.left + targetBounds.width / 2, height - (targetBounds.top - bounds.top + targetBounds.height / 2), 0);
-    const start = new THREE.Vector3(Math.max(15, target.x - width * .65), Math.min(height - 5, target.y + innerHeight * .64), 0);
+    const start = new THREE.Vector3(Math.max(15, target.x - width * .65), Math.min(height - 5, target.y + (background ? hero.viewportHeight : innerHeight) * .64), 0);
     const p = Math.min(age / 900, 1), eased = p * p;
     rock.position.copy(start).lerp(target, eased);
     rock.rotation.set(age * .002, age * .003, age * .001);
@@ -155,7 +158,7 @@ function meteorEntrance(hero, machine, impact, finish) {
       const q = Math.min((age - 900) / 1050, 1);
       ripple.position.copy(target); ripple.scale.setScalar(12 + q * Math.min(width, 650)); ripple.material.opacity = (1 - q) * .5;
     }
-    renderer.render(scene, camera);
+    if (!hero.framePending) { renderer.render(scene, camera); if (background) renderer.getContext().finish(); hero.present?.(); }
     raf = requestAnimationFrame(draw);
   }
   raf = requestAnimationFrame(draw);

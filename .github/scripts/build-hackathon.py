@@ -15,6 +15,8 @@ ROOT = Path(__file__).resolve().parents[2]
 SHARED = (
     "assets",
     "motion.css",
+    "enhancements.css",
+    "scene-client.js",
     "motion.js",
     "polish.css",
     "orbital.js",

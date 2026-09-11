@@ -13,7 +13,12 @@ includes shared assets, and makes its home links point back to the main site.
 There is no second copy of the page to edit and no manual Azure upload.
 The existing main-site workflow and `/hackathon/` page continue to work.
 
-For a local check, run `python3 .github/scripts/build-hackathon.py`, then
+The added 3D effects and styles are compiled automatically by both workflows.
+Keep editing their source files; generated `assets/runtime/` and
+`enhancements.css` do not need manual editing.
+
+For a local check, first run `bash .github/scripts/build-effects.sh`, then
+run `python3 .github/scripts/build-hackathon.py`, then
 `python3 -m http.server 4177 --directory .github/.build/hackathon`.
 The output directory is generated and ignored by Git. The build refuses to
 overwrite an existing output directory; use a new `--output` path for a repeat

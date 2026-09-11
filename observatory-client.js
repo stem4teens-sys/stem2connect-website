@@ -12,7 +12,7 @@ export async function mountObservatory(host, reduced, signal) {
   const context = canvas.getContext('bitmaprenderer');
   if (!context) { canvas.remove(); makeStatic(); return () => {}; }
   let worker;
-  try { worker = new Worker(new URL('./observatory-worker.js?v=3', import.meta.url), { type: 'module' }); }
+  try { worker = new Worker(new URL('./assets/runtime/observatory-worker.js', import.meta.url), { type: 'module' }); }
   catch { canvas.remove(); makeStatic(); return () => {}; }
   let stopped = false, inView = true, pointerFrame = 0, pointer, scrollFrame = 0, startup;
   const send = data => { if (!stopped) worker.postMessage(data); };
@@ -48,8 +48,8 @@ export async function mountObservatory(host, reduced, signal) {
   const unavailable = () => {
     dispose(); makeStatic();
   };
-  // Unavailable or unusually slow graphics must never leave a blank illustration.
-  startup = setTimeout(unavailable, 12000);
+  // Keep the poster visible while slow graphics prepare, without interrupting the page.
+  startup = setTimeout(() => host.classList.add('is-static'), 12000);
   worker.addEventListener('error', unavailable, { once: true });
   worker.addEventListener('message', ({ data }) => {
     if (data.type === 'frame') {
@@ -58,11 +58,12 @@ export async function mountObservatory(host, reduced, signal) {
       if (canvas.height !== data.bitmap.height) canvas.height = data.bitmap.height;
       context.transferFromImageBitmap(data.bitmap);
       clearTimeout(startup); send({ type: 'frame-presented' });
+      host.classList.remove('is-static');
       host.classList.add('has-live-scene');
     }
     else if (data.type === 'unavailable') unavailable();
   });
-  worker.postMessage({ type: 'init', width: host.clientWidth, height: host.clientHeight, visible: !document.hidden, reduced: reduced.matches });
+  worker.postMessage({ type: 'init', assetBase: new URL('./assets/models/', import.meta.url).href, width: host.clientWidth, height: host.clientHeight, visible: !document.hidden, reduced: reduced.matches });
   events.forEach(name => host.addEventListener(name, input)); host.addEventListener('pointermove', move, { passive: true });
   document.addEventListener('visibilitychange', visibility); window.addEventListener('scroll', scroll, { passive: true });
   resize.observe(host); observer.observe(host); signal.addEventListener('abort', dispose, { once: true });
