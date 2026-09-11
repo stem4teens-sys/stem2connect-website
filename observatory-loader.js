@@ -6,6 +6,35 @@
   const wide = matchMedia('(min-width: 1680px) and (hover: hover) and (pointer: fine)');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   let generation = 0, cleanup, host, request;
+  // Keep the complete scene off the initial page-load path. Abort pending work on resize.
+  function whenIdle(signal) {
+    return new Promise(resolve => {
+      let idle, timer;
+      const finish = () => {
+        window.removeEventListener('load', queue);
+        document.removeEventListener('visibilitychange', queue);
+        if (idle !== undefined) cancelIdleCallback(idle);
+        clearTimeout(timer); signal.removeEventListener('abort', finish); resolve();
+      };
+      const queue = () => {
+        if (document.readyState !== 'complete' || document.hidden || idle !== undefined || timer) return;
+        if ('requestIdleCallback' in window) idle = requestIdleCallback(finish, { timeout: 1000 });
+        else timer = setTimeout(finish, 80);
+      };
+      signal.addEventListener('abort', finish, { once: true });
+      window.addEventListener('load', queue, { once: true });
+      document.addEventListener('visibilitychange', queue);
+      queue();
+    });
+  }
+  function whenVisible(element, signal) {
+    return new Promise(resolve => {
+      const finish = () => { observer.disconnect(); signal.removeEventListener('abort', finish); resolve(); };
+      const observer = new IntersectionObserver(entries => { if (entries[0].isIntersecting) finish(); });
+      signal.addEventListener('abort', finish, { once: true });
+      observer.observe(element);
+    });
+  }
   async function refresh() {
     const current = ++generation;
     request?.abort(); cleanup?.(); cleanup = undefined;
@@ -16,11 +45,20 @@
     const element = document.createElement('div');
     element.className = 'world-observatory';
     element.setAttribute('role', 'img');
-    element.setAttribute('aria-label', 'Interactive globe illustrating global STEM connections. Drag or use the arrow keys to rotate.');
+    element.setAttribute('aria-label', 'Interactive globe with student figures reading and waving around the world. Drag or use the arrow keys to rotate.');
     element.tabIndex = 0;
+    const poster = document.createElement('img');
+    poster.className = 'observatory-poster'; poster.alt = ''; poster.decoding = 'async';
+    poster.src = new URL('assets/models/globe-poster.webp', source).href;
+    poster.addEventListener('load', () => element.classList.add('is-ready'), { once: true });
+    element.append(poster);
     host = element; hero.append(element);
     try {
-      const module = await import(new URL('observatory.js?v=1', source).href);
+      await whenIdle(signal);
+      if (signal.aborted) return;
+      await whenVisible(element, signal);
+      if (signal.aborted) return;
+      const module = await import(new URL('observatory-client.js?v=3', source).href);
       if (current !== generation) return;
       const dispose = await module.mountObservatory(element, reduced, signal);
       if (current !== generation) { dispose?.(); return; }

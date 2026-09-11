@@ -1,43 +1,44 @@
 import * as THREE from './assets/vendor/three.module.min.js';
-import { createStage, lighting } from './three-stage.js';
+import { createStage } from './observatory-stage.js?v=3';
+import { createStudents } from './globe-students.js?v=3';
 
 export async function mountObservatory(host, reduced, signal) {
-  const response = await fetch(new URL('./assets/models/earth-land.json', import.meta.url), { signal });
-  if (!response.ok) throw new Error('Globe map unavailable');
-  const data = await response.json();
-  if (signal.aborted || !host.isConnected) return;
+  // Decoded, pre-baked textures avoid parsing geography and painting canvases during startup.
+  const loadImage = async name => {
+    const response = await fetch(new URL(`./assets/models/${name}`, import.meta.url), { signal });
+    if (!response.ok) throw new Error('Globe texture unavailable');
+    const blob = await response.blob();
+    return createImageBitmap(blob, { imageOrientation: 'flipY' });
+  };
+  const images = await Promise.allSettled([loadImage('earth-color.webp'), loadImage('earth-relief.webp')]);
+  if (signal.aborted || !host.isConnected || images.some(image => image.status === 'rejected')) {
+    images.forEach(image => { if (image.status === 'fulfilled') image.value.close(); });
+    return;
+  }
   const stage = createStage(host, 'observatory-canvas', reduced);
-  if (!stage) return;
+  if (!stage) { images.forEach(image => image.value.close()); return; }
   const { scene, camera, renderer } = stage;
+  // One CSS pixel per drawing pixel is ample here; avoid a multi-megapixel retina canvas.
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.05;
-  lighting(scene);
+  renderer.toneMappingExposure = 1;
+  scene.add(new THREE.HemisphereLight(0xfff4dd, 0x766954, 1.25));
+  const keyLight = new THREE.DirectionalLight(0xfff3d9, 1.55);
+  keyLight.position.set(-4, 6, 7); scene.add(keyLight);
+  const fillLight = new THREE.DirectionalLight(0xfff5e4, .65);
+  fillLight.position.set(4, -1, 5); scene.add(fillLight);
   const textures = [];
-  const texture = canvas => {
-    const map = new THREE.CanvasTexture(canvas);
-    map.colorSpace = THREE.SRGBColorSpace;
-    map.anisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), 4);
+  const texture = (image, color = true) => {
+    const map = image instanceof ImageBitmap ? new THREE.Texture(image) : new THREE.CanvasTexture(image);
+    map.colorSpace = color ? THREE.SRGBColorSpace : THREE.NoColorSpace;
+    map.anisotropy = 2; map.needsUpdate = true;
     textures.push(map); return map;
   };
 
-  // A small studio environment gives the satin metals broad, soft reflections.
-  const studio = document.createElement('canvas'); studio.width = 512; studio.height = 256;
-  const studioContext = studio.getContext('2d');
-  const gradient = studioContext.createLinearGradient(0, 0, 0, 256);
-  gradient.addColorStop(0, '#fffdf5'); gradient.addColorStop(.42, '#eeebe0');
-  gradient.addColorStop(.58, '#aba697'); gradient.addColorStop(1, '#f4e9d3');
-  studioContext.fillStyle = gradient; studioContext.fillRect(0, 0, 512, 256);
-  studioContext.fillStyle = '#ffffff'; studioContext.fillRect(55, 24, 92, 170);
-  studioContext.fillStyle = '#8a8276'; studioContext.fillRect(335, 90, 46, 118);
-  scene.environment = texture(studio);
-  scene.environment.mapping = THREE.EquirectangularReflectionMapping;
-  scene.environmentIntensity = .6;
-
   const model = new THREE.Group(); scene.add(model);
-  const material = (color, metalness = 0, roughness = .55) => new THREE.MeshStandardMaterial({ color, metalness, roughness });
-  const ivory = material(0xfff3da, .08, .42);
-  const red = material(0x940d13, .55, .32);
-  const gold = material(0xd6af61, .7, .33);
+  const material = (color, metalness = 0, roughness = .55) => new THREE.MeshPhongMaterial({ color, specular: new THREE.Color(color).lerp(new THREE.Color(0xffffff), .45), shininess: 8 + (1 - roughness) * 48 });
+  const ivory = material(0xeee0c5, .08, .6);
+  const red = material(0x8a251c, .55, .4);
+  const gold = material(0xd1ba8d, .7, .4);
   const green = material(0x008f4b, .15, .34);
   const nodeRed = material(0xb71016, .28, .28);
   const panel = material(0x172e25, .4, .48);
@@ -47,78 +48,57 @@ export async function mountObservatory(host, reduced, signal) {
     parent.add(object); return object;
   };
   function cylinder(radiusTop, radiusBottom, height, surface, y) {
-    return mesh(new THREE.CylinderGeometry(radiusTop, radiusBottom, height, 96), surface, model, [0, y, 0]);
+    return mesh(new THREE.CylinderGeometry(radiusTop, radiusBottom, height, 64), surface, model, [0, y, 0]);
   }
-  // Turned pedestal with concentric grooves and a red lower edge.
-  cylinder(1.1, 1.15, .15, red, -2.16);
-  cylinder(1.13, 1.13, .08, ivory, -2.05);
-  cylinder(1.06, 1.1, .1, ivory, -1.96);
-  cylinder(.97, 1.04, .15, ivory, -1.84);
-  [1.105, 1.045, .975].forEach((radius, index) => {
-    const ring = mesh(new THREE.TorusGeometry(radius, .009, 6, 96), gold, model, [0, -2.025 + index * .1, 0]); ring.rotation.x = Math.PI / 2;
+  // Low, layered ivory plinth and a deep red meridian, proportioned to the concept image.
+  cylinder(1.08, 1.09, .10, red, -2.07);
+  cylinder(1.055, 1.075, .055, ivory, -1.992);
+  cylinder(1.025, 1.025, .085, ivory, -1.925);
+  cylinder(.96, .99, .075, ivory, -1.845);
+  [1.052, 1.022, .965].forEach((radius, index) => {
+    const ring = mesh(new THREE.TorusGeometry(radius, .008, 5, 64), gold, model, [0, -1.97 + index * .075, 0]); ring.rotation.x = Math.PI / 2;
   });
-  cylinder(.17, .2, .21, gold, -1.68);
-  cylinder(.115, .14, .21, red, -1.49);
+  cylinder(.16, .2, .12, gold, -1.745);
+  cylinder(.12, .15, .22, red, -1.60);
 
-  const cradle = new THREE.Group(); cradle.position.y = .35; cradle.rotation.z = -.26; model.add(cradle);
-  // A solid annular band, including its narrow edge, instead of a wireframe circle.
-  const annulus = (inner, outer, depth) => {
-    const shape = new THREE.Shape(); shape.absarc(0, 0, outer, 0, Math.PI * 2, false);
-    const hole = new THREE.Path(); hole.absarc(0, 0, inner, 0, Math.PI * 2, true); shape.holes.push(hole);
-    const geometry = new THREE.ExtrudeGeometry(shape, { depth, bevelEnabled: true, bevelSegments: 2, bevelSize: .008, bevelThickness: .008, steps: 1, curveSegments: 96 });
+  const cradle = new THREE.Group(); cradle.position.set(.06, .35, 0); cradle.rotation.z = .20; model.add(cradle);
+  const annulus = (inner, outer, depth, half = false) => {
+    const shape = new THREE.Shape();
+    if (half) {
+      shape.absarc(0, 0, outer, Math.PI / 2, Math.PI * 1.5, false);
+      shape.absarc(0, 0, inner, Math.PI * 1.5, Math.PI / 2, true);
+      shape.closePath();
+    } else {
+      shape.absarc(0, 0, outer, 0, Math.PI * 2, false);
+      const hole = new THREE.Path(); hole.absarc(0, 0, inner, 0, Math.PI * 2, true); shape.holes.push(hole);
+    }
+    const geometry = new THREE.ExtrudeGeometry(shape, { depth, bevelEnabled: true, bevelSegments: 1, bevelSize: .006, bevelThickness: .006, steps: 1, curveSegments: 48 });
     geometry.translate(0, 0, -depth / 2); return geometry;
   };
-  const meridian = mesh(annulus(1.76, 1.86, .085), red, cradle);
-  meridian.rotation.y = -.22;
+  const meridian = mesh(annulus(1.76, 1.91, .105, true), red, cradle);
+  meridian.rotation.y = .55;
+  const meridianTrim = mesh(annulus(1.76, 1.772, .111, true), gold, cradle); meridianTrim.rotation.y = .55;
   [-1, 1].forEach(sign => {
-    mesh(new THREE.CylinderGeometry(.12, .12, .17, 32), gold, cradle, [0, sign * 1.74, 0]);
-    mesh(new THREE.SphereGeometry(.08, 20, 12), gold, cradle, [0, sign * 1.94, 0]);
+    mesh(new THREE.CylinderGeometry(.13, .13, .18, 20), red, cradle, [0, sign * 1.75, 0]);
+    mesh(new THREE.CylinderGeometry(.105, .105, .04, 20), gold, cradle, [0, sign * 1.86, 0]);
+    mesh(new THREE.SphereGeometry(.075, 14, 10), gold, cradle, [0, sign * 1.96, 0]);
   });
-  const equator = mesh(annulus(1.96, 2.015, .035), gold, cradle);
+  const equator = mesh(annulus(1.77, 1.96, .048), gold, cradle, [0, -.10, 0]);
   equator.rotation.x = Math.PI / 2;
   const ticks = [];
-  for (let i = 0; i < 180; i++) {
-    const angle = i / 180 * Math.PI * 2;
-    [i % 5 ? 1.991 : 1.972, 2.007].forEach(radius => ticks.push(new THREE.Vector3(Math.cos(angle) * radius, .024, Math.sin(angle) * radius)));
+  for (let i = 0; i < 144; i++) {
+    const angle = i / 144 * Math.PI * 2;
+    [i % 4 ? 1.923 : 1.867, 1.949].forEach(radius => ticks.push(new THREE.Vector3(Math.cos(angle) * radius, -.07, Math.sin(angle) * radius)));
   }
-  cradle.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(ticks), new THREE.LineBasicMaterial({ color: 0x775326, transparent: true, opacity: .7 })));
+  cradle.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(ticks), new THREE.LineBasicMaterial({ color: 0x6d4f2c, transparent: true, opacity: .62 })));
 
-  // Equirectangular geography and raised coastline shading are generated from public-domain land polygons.
-  const mapCanvas = document.createElement('canvas'); mapCanvas.width = 2048; mapCanvas.height = 1024;
-  const mapContext = mapCanvas.getContext('2d');
-  mapContext.fillStyle = '#fff3da'; mapContext.fillRect(0, 0, 2048, 1024);
-  const reliefCanvas = document.createElement('canvas'); reliefCanvas.width = 2048; reliefCanvas.height = 1024;
-  const relief = reliefCanvas.getContext('2d'); relief.fillStyle = '#777777'; relief.fillRect(0, 0, 2048, 1024);
-  function landPath(context, polygon) {
-    context.beginPath();
-    polygon.forEach(ring => {
-      ring.forEach(([longitude, latitude], index) => {
-        const x = (longitude + 180) / 360 * 2048, y = (90 - latitude) / 180 * 1024;
-        if (index) context.lineTo(x, y); else context.moveTo(x, y);
-      });
-      context.closePath();
-    });
-  }
-  data.polygons.forEach(polygon => {
-    landPath(mapContext, polygon); mapContext.fillStyle = '#649568'; mapContext.fill('evenodd');
-    mapContext.strokeStyle = '#4f7951'; mapContext.lineWidth = 1.1; mapContext.stroke();
-    landPath(relief, polygon); relief.fillStyle = '#a7a7a7'; relief.fill('evenodd');
-  });
-  mapContext.strokeStyle = 'rgba(124,103,66,.25)'; mapContext.lineWidth = .65;
-  for (let longitude = -180; longitude < 180; longitude += 15) {
-    const x = (longitude + 180) / 360 * 2048;
-    mapContext.beginPath(); mapContext.moveTo(x, 0); mapContext.lineTo(x, 1024); mapContext.stroke();
-  }
-  for (let latitude = -75; latitude <= 75; latitude += 15) {
-    const y = (90 - latitude) / 180 * 1024;
-    mapContext.beginPath(); mapContext.moveTo(0, y); mapContext.lineTo(2048, y); mapContext.stroke();
-  }
   const earthSystem = new THREE.Group(); cradle.add(earthSystem);
-  const earthMaterial = material(0xffffff, .03, .68);
-  earthMaterial.map = texture(mapCanvas);
-  earthMaterial.bumpMap = texture(reliefCanvas); earthMaterial.bumpMap.colorSpace = THREE.NoColorSpace;
-  earthMaterial.bumpScale = .032;
-  mesh(new THREE.SphereGeometry(1.63, 96, 64), earthMaterial, earthSystem);
+  const earthMaterial = material(0xffffff, 0, .95);
+  earthMaterial.specular.setHex(0x242019);
+  earthMaterial.map = texture(images[0].value);
+  earthMaterial.bumpMap = texture(images[1].value, false);
+  earthMaterial.bumpScale = .012;
+  mesh(new THREE.SphereGeometry(1.63, 64, 40), earthMaterial, earthSystem);
   const coordinate = (latitude, longitude, radius = 1.65) => {
     const lat = THREE.MathUtils.degToRad(latitude), lon = THREE.MathUtils.degToRad(longitude);
     return new THREE.Vector3(radius * Math.cos(lat) * Math.cos(lon), radius * Math.sin(lat), -radius * Math.cos(lat) * Math.sin(lon));
@@ -127,23 +107,24 @@ export async function mountObservatory(host, reduced, signal) {
   const locations = [[40.7,-74], [51.5,-.12], [28.6,77.2], [-1.3,36.8], [-23.5,-46.6], [35.7,139.7], [-33.9,151.2]];
   const points = locations.map((location, index) => {
     const point = coordinate(...location);
-    const node = mesh(new THREE.SphereGeometry(.048, 18, 12), index % 2 ? green : nodeRed, earthSystem); node.position.copy(point);
+    const node = mesh(new THREE.SphereGeometry(.037, 10, 8), index % 2 ? green : nodeRed, earthSystem); node.position.copy(point);
     return point;
   });
+  const animateStudents = createStudents(earthSystem, locations, coordinate);
   [[0,1],[1,2],[2,3],[3,4],[2,5],[5,6]].forEach(([a,b]) => {
     const angle = points[a].angleTo(points[b]);
-    const arc = Array.from({length:49}, (_, i) => {
-      const t = i / 48;
+    const arc = Array.from({length:33}, (_, i) => {
+      const t = i / 32;
       const point = points[a].clone().multiplyScalar(Math.sin((1-t)*angle)).addScaledVector(points[b],Math.sin(t*angle)).normalize();
       return point.multiplyScalar(1.65 + Math.sin(t*Math.PI)*.25);
     });
-    mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(arc),48,.008,5,false),gold,earthSystem);
+    mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(arc),32,.006,4,false),gold,earthSystem);
   });
 
-  const orbital = new THREE.Group(); orbital.rotation.set(.8,.1,-.35); cradle.add(orbital);
-  const orbitRadius = 2.18;
-  mesh(new THREE.TorusGeometry(orbitRadius,.007,5,160),gold,orbital);
-  const satellite = new THREE.Group(); orbital.add(satellite);
+  const orbital = new THREE.Group(); orbital.rotation.set(.25,.45,-.25); cradle.add(orbital);
+  const orbitRadius = 2.16;
+  mesh(new THREE.TorusGeometry(orbitRadius,.005,4,96),gold,orbital);
+  const satellite = new THREE.Group(); satellite.scale.setScalar(1.18); orbital.add(satellite);
   mesh(new THREE.BoxGeometry(.15,.19,.13),ivory,satellite);
   const shell = mesh(new THREE.CylinderGeometry(.077,.077,.17,20),gold,satellite); shell.rotation.x = Math.PI / 2;
   mesh(new THREE.BoxGeometry(.64,.018,.018),gold,satellite,[0,0,-.035]);
@@ -163,16 +144,16 @@ export async function mountObservatory(host, reduced, signal) {
   const dish = mesh(new THREE.ConeGeometry(.075,.04,24,1,true),gold,satellite,[0,.15,0]); dish.rotation.x = .45;
 
   // Soft contact shadow generated procedurally; no image downloads or live services.
-  const shadowCanvas = document.createElement('canvas'); shadowCanvas.width=256; shadowCanvas.height=256;
+  const shadowCanvas = new OffscreenCanvas(256, 256);
   const shadowContext=shadowCanvas.getContext('2d');
   const shade=shadowContext.createRadialGradient(128,128,14,128,128,128);
   shade.addColorStop(0,'rgba(63,35,17,.24)'); shade.addColorStop(.5,'rgba(63,35,17,.09)'); shade.addColorStop(1,'rgba(63,35,17,0)');
   shadowContext.fillStyle=shade; shadowContext.fillRect(0,0,256,256);
-  const shadow=mesh(new THREE.PlaneGeometry(4.7,3.5),new THREE.MeshBasicMaterial({map:texture(shadowCanvas),transparent:true,depthWrite:false}),model,[0,-2.247,0]);
+  const shadow=mesh(new THREE.PlaneGeometry(4.7,3.5),new THREE.MeshBasicMaterial({map:texture(shadowCanvas),transparent:true,depthWrite:false}),model,[0,-2.127,0]);
   shadow.rotation.x=-Math.PI/2;
 
   let dragging=false,lastX=0,lastY=0,yaw=0,pitch=0,aimX=0,aimY=0,focused=false;
-  const initialYaw=THREE.MathUtils.degToRad(-66);
+  const initialYaw=THREE.MathUtils.degToRad(-67);
   const setInput=event=>{
     const bounds=host.getBoundingClientRect();
     aimX=(event.clientX-bounds.left)/bounds.width*2-1;
@@ -198,26 +179,31 @@ export async function mountObservatory(host, reduced, signal) {
   Object.entries(listeners).forEach(([event,fn])=>host.addEventListener(event,fn));
   let spin=0;
   stage.draw=({elapsed,dt})=>{
-    if(!dragging&&!focused&&!reduced.matches)spin+=dt*.032;
+    if(!dragging&&!focused&&!reduced.matches)spin+=dt*.021;
+    animateStudents(reduced.matches ? 0 : elapsed);
     earthSystem.rotation.y=initialYaw+yaw+spin;
     model.rotation.y+=(aimX*.07-model.rotation.y)*.08;
     cradle.rotation.x=pitch-aimY*.025;
-    const angle=.72+(reduced.matches?0:elapsed*.055);
+    const angle=.82+(reduced.matches?0:Math.sin(elapsed*.075)*.16);
     satellite.position.set(Math.cos(angle)*orbitRadius,Math.sin(angle)*orbitRadius,0);
     satellite.rotation.z=angle-.4;
     // A small scroll response keeps the stationary instrument grounded in its existing space.
-    model.rotation.z=THREE.MathUtils.clamp(window.scrollY*.000035,0,.035);
+    model.rotation.z=THREE.MathUtils.clamp(host.scrollY*.000035,0,.035);
   };
-  function renderStill(){stage.draw({elapsed:0,dt:0});renderer.render(scene,camera);}
+  function renderStill(){stage.draw({elapsed:0,dt:0});stage.renderOnce();}
   stage.resize=()=>{
-    const distance=Math.max(2.85,2.66/camera.aspect)/Math.tan(THREE.MathUtils.degToRad(18));
-    camera.fov=36;camera.position.set(0,.9,distance);camera.lookAt(0,-.08,0);camera.updateProjectionMatrix();
+    const distance=Math.max(2.7,2.8/camera.aspect)/Math.tan(THREE.MathUtils.degToRad(18));
+    camera.fov=36;camera.position.set(0,.8,distance);camera.lookAt(0,.02,0);camera.updateProjectionMatrix();
     renderStill();
   };
   stage.resize();
   stage.onDispose(()=>{
     Object.entries(listeners).forEach(([event,fn])=>host.removeEventListener(event,fn));
+    earthSystem.traverse(object=>{if(object.isInstancedMesh)object.dispose();});
     textures.forEach(map=>map.dispose());
+    images.forEach(image=>image.value.close());
   });
+  await stage.start();
+  if (signal.aborted || !host.isConnected) { stage.dispose(); return; }
   return stage.dispose;
 }
