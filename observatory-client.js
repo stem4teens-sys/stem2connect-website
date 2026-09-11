@@ -4,15 +4,16 @@ export async function mountObservatory(host, reduced, signal) {
     host.classList.remove('has-live-scene'); host.classList.add('is-static'); host.removeAttribute('tabindex');
     host.setAttribute('aria-label', 'Globe illustrating students learning and connecting around the world.');
   };
-  if (!('Worker' in window) || !('OffscreenCanvas' in window) || reduced.matches) {
+  if (!('Worker' in window) || !('OffscreenCanvas' in window) || !HTMLCanvasElement.prototype.transferControlToOffscreen || reduced.matches) {
     makeStatic(); return () => {};
   }
   const canvas = document.createElement('canvas');
   canvas.className = 'observatory-canvas'; canvas.setAttribute('aria-hidden', 'true'); host.prepend(canvas);
-  const context = canvas.getContext('bitmaprenderer');
-  if (!context) { canvas.remove(); makeStatic(); return () => {}; }
+  let surface;
+  try { surface = canvas.transferControlToOffscreen(); }
+  catch { canvas.remove(); makeStatic(); return () => {}; }
   let worker;
-  try { worker = new Worker(new URL('./assets/runtime/observatory-worker.js', import.meta.url), { type: 'module' }); }
+  try { worker = new Worker(new URL('./assets/runtime/observatory-worker.js?v=5', import.meta.url), { type: 'module' }); }
   catch { canvas.remove(); makeStatic(); return () => {}; }
   let stopped = false, inView = true, pointerFrame = 0, pointer, scrollFrame = 0, startup;
   const send = data => { if (!stopped) worker.postMessage(data); };
@@ -52,18 +53,15 @@ export async function mountObservatory(host, reduced, signal) {
   startup = setTimeout(() => host.classList.add('is-static'), 12000);
   worker.addEventListener('error', unavailable, { once: true });
   worker.addEventListener('message', ({ data }) => {
-    if (data.type === 'frame') {
-      if (stopped) { data.bitmap.close(); return; }
-      if (canvas.width !== data.bitmap.width) canvas.width = data.bitmap.width;
-      if (canvas.height !== data.bitmap.height) canvas.height = data.bitmap.height;
-      context.transferFromImageBitmap(data.bitmap);
-      clearTimeout(startup); send({ type: 'frame-presented' });
+    if (data.type === 'painted') {
+      if (stopped) return;
+      clearTimeout(startup);
       host.classList.remove('is-static');
       host.classList.add('has-live-scene');
     }
     else if (data.type === 'unavailable') unavailable();
   });
-  worker.postMessage({ type: 'init', assetBase: new URL('./assets/models/', import.meta.url).href, width: host.clientWidth, height: host.clientHeight, visible: !document.hidden, reduced: reduced.matches });
+  worker.postMessage({ type: 'init', canvas: surface, assetBase: new URL('./assets/models/', import.meta.url).href, width: host.clientWidth, height: host.clientHeight, visible: !document.hidden, reduced: reduced.matches }, [surface]);
   events.forEach(name => host.addEventListener(name, input)); host.addEventListener('pointermove', move, { passive: true });
   document.addEventListener('visibilitychange', visibility); window.addEventListener('scroll', scroll, { passive: true });
   resize.observe(host); observer.observe(host); signal.addEventListener('abort', dispose, { once: true });

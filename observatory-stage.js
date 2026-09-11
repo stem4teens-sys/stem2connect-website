@@ -5,28 +5,32 @@ export function createStage(host, className, reduced) {
   let renderer;
   try { renderer = new THREE.WebGLRenderer({ canvas: host.canvas, alpha: true, antialias: true, powerPreference: 'low-power' }); }
   catch { return null; }
+  renderer.debug.checkShaderErrors = false;
   renderer.setClearColor(0x000000, 0);
   const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(36, 1, .1, 50);
   const callbacks = [];
-  let stopped = false, ready = false, frame = 0, last = 0, elapsed = 0;
+  let stopped = false, ready = false, frame = 0, last = 0, elapsed = 0, painted = false;
   let pixelBudget = 1100000, slowFrames = 0, interval = 1000 / 24;
-  const requestFrame = fn => setTimeout(() => fn(performance.now()), interval);
-  const cancelFrame = clearTimeout;
+  let sizedWidth = 0, sizedHeight = 0, sizedRatio = 0;
+  const nativeFrames = typeof self.requestAnimationFrame === 'function';
+  const requestFrame = nativeFrames
+    ? self.requestAnimationFrame.bind(self) : fn => setTimeout(() => fn(performance.now()), interval);
+  const cancelFrame = typeof self.cancelAnimationFrame === 'function' ? self.cancelAnimationFrame.bind(self) : clearTimeout;
   const stage = { scene, camera, renderer, draw: () => {}, resize: () => {}, renderOnce, start, dispose, onDispose: fn => callbacks.push(fn) };
   function renderOnce() {
-    if (ready && !stopped && host.visible && !host.framePending) {
+    if (ready && !stopped && host.visible) {
       renderer.render(scene, camera);
-      renderer.getContext().finish();
-      host.framePending = true;
-      const bitmap = host.canvas.transferToImageBitmap();
-      self.postMessage({ type: 'frame', bitmap }, [bitmap]);
+      if (!nativeFrames) renderer.getContext().flush();
+      if (!painted) { painted = true; self.postMessage({ type: 'painted' }); }
     }
   }
   function size() {
     if (stopped) return;
     const width = Math.max(1, host.width), height = Math.max(1, host.height);
-    renderer.setPixelRatio(Math.min(1, Math.sqrt(pixelBudget / (width * height))));
-    renderer.setSize(width, height, false);
+    const ratio = Math.min(1, Math.sqrt(pixelBudget / (width * height)));
+    if (width === sizedWidth && height === sizedHeight && ratio === sizedRatio) return;
+    sizedWidth = width; sizedHeight = height; sizedRatio = ratio;
+    renderer.setDrawingBufferSize(width, height, ratio);
     camera.aspect = width / height; camera.updateProjectionMatrix(); stage.resize();
     renderOnce(); resume();
   }
@@ -50,7 +54,9 @@ export function createStage(host, className, reduced) {
   async function start() {
     size();
     try {
-      renderer.compile(scene, camera);
+      const compilation = renderer.compileAsync(scene, camera);
+      renderer.getContext().flush();
+      await compilation;
       if (stopped) return false;
       ready = true; renderOnce(); resume(); return true;
     } catch (error) { dispose(); throw error; }

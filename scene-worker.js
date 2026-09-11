@@ -2,9 +2,12 @@
 import { mountOrbital } from './orbital.js';
 import { mountMolecules } from './sculptures.js';
 
-// Independent bitmap canvases do not need a window animation-frame clock.
-self.requestAnimationFrame = callback => setTimeout(() => callback(performance.now()), 34);
-self.cancelAnimationFrame = clearTimeout;
+// Transferred canvases use the worker's native frame clock when available.
+const nativeFrames = typeof self.requestAnimationFrame === 'function';
+if (!nativeFrames) {
+  self.requestAnimationFrame = callback => setTimeout(() => callback(performance.now()), 34);
+  self.cancelAnimationFrame = clearTimeout;
+}
 class SceneHost extends EventTarget {
   classList = { add() {}, remove() {} };
   skip = new EventTarget();
@@ -16,24 +19,17 @@ let host, hero, dispose;
 self.addEventListener('message', async ({ data }) => {
   try {
     if (data.type === 'init') {
-      host = Object.assign(new SceneHost(), data.host, { canvas: new OffscreenCanvas(data.host.clientWidth, data.host.clientHeight), background: true });
-      hero = Object.assign(new SceneHost(), data.hero, { canvas: data.kind === 'orbital' ? new OffscreenCanvas(data.hero.clientWidth, data.hero.clientHeight) : null, hidden: false });
+      host = Object.assign(new SceneHost(), data.host, { background: true, flushFrames: !nativeFrames });
+      hero = Object.assign(new SceneHost(), data.hero, { hidden: false, flushFrames: !nativeFrames });
       hero.skip.remove = () => {};
       hero.dataset = new Proxy({}, {
         set(target, key, value) { target[key] = value; self.postMessage({ type: 'intro', value }); return true; },
         deleteProperty(target, key) { delete target[key]; self.postMessage({ type: 'intro', value: null }); return true; }
       });
-      const present = (target, kind) => {
-        if (target.framePending) return;
-        target.framePending = true; const bitmap = target.canvas.transferToImageBitmap();
-        self.postMessage({ type: 'frame', kind, bitmap }, [bitmap]);
-      };
-      host.present = () => present(host, 'scene'); hero.present = () => present(hero, 'meteor');
       host.onFrame = () => self.postMessage({ type: 'ready' });
       dispose = await (data.kind === 'orbital' ? mountOrbital(host, hero, { matches: false }) : mountMolecules(host, { matches: false }));
       if (!dispose) self.postMessage({ type: 'unavailable' });
-    } else if (data.type === 'presented' && host) {
-      (data.kind === 'meteor' ? hero : host).framePending = false;
+
     } else if (data.type === 'resize' && host) {
       Object.assign(host, data.host); Object.assign(hero, data.hero);
       host.dispatchEvent(new Event('resize'));

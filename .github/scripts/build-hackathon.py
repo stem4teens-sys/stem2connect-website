@@ -17,6 +17,7 @@ SHARED = (
     "motion.css",
     "enhancements.css",
     "scene-client.js",
+    "static-batches.js",
     "motion.js",
     "polish.css",
     "orbital.js",

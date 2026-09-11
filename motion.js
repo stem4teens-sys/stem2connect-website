@@ -349,11 +349,10 @@
     const observer = new IntersectionObserver(entries => {
       if (!entries[0].isIntersecting) return;
       observer.disconnect();
-      // Yield to text and navigation without depending on animation-frame delivery.
+      // Start after the first layout; direct worker rendering keeps input independent.
       setTimeout(() => {
         if (reduced.matches || generation !== sceneGeneration) return;
-        Promise.allSettled([...animations].map(animation => animation.finished)).then(() =>
-          import(new URL('scene-client.js?v=4', scriptURL).href)).then(module => {
+        import(new URL('scene-client.js?v=5', scriptURL).href).then(module => {
           if (reduced.matches || generation !== sceneGeneration) return;
           cleanups.push(module.mountScene(host, hero, machine ? 'orbital' : 'molecules', reduced));
           requestUpdate();

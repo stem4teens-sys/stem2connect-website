@@ -1,6 +1,6 @@
 // This bridge never imports Three.js or creates a WebGL context on the page.
 export function mountScene(host, hero, kind, reduced) {
-  if (reduced.matches || !window.Worker || !window.OffscreenCanvas) return () => {};
+  if (reduced.matches || !window.Worker || !window.OffscreenCanvas || !HTMLCanvasElement.prototype.transferControlToOffscreen) return () => {};
   const canvas = document.createElement('canvas');
   canvas.className = kind === 'orbital' ? 'orbital-canvas' : 'molecular-canvas';
   canvas.setAttribute('aria-hidden', 'true'); canvas.style.opacity = '0';
@@ -28,25 +28,17 @@ export function mountScene(host, hero, kind, reduced) {
     canvas.remove(); meteor?.remove(); host.classList.remove('has-webgl'); clearIntro();
   }
   try {
-    worker = new Worker(new URL('./assets/runtime/scene-worker.js', import.meta.url), { type: 'module' });
+    worker = new Worker(new URL('./assets/runtime/scene-worker.js?v=5', import.meta.url), { type: 'module' });
     host.prepend(canvas); if (meteor) hero.append(meteor);
-    const context = canvas.getContext('bitmaprenderer');
-    const meteorContext = meteor?.getContext('bitmaprenderer');
-    if (!context || (meteor && !meteorContext)) { dispose(); return dispose; }
+    // Transfer ownership once. The browser composites the worker canvas directly.
+    const surface = canvas.transferControlToOffscreen();
+    const entranceSurface = meteor?.transferControlToOffscreen();
     let introPlayed = new URLSearchParams(location.search).get('intro') === '0';
     try { introPlayed ||= sessionStorage.getItem('stem2connect-orbit-intro-v2') === '1'; } catch {}
     worker.addEventListener('error', dispose, { once: true });
     worker.addEventListener('message', ({ data }) => {
-      if (stopped) { data.bitmap?.close(); return; }
-      if (data.type === 'frame') {
-        const target = data.kind === 'meteor' ? meteor : canvas;
-        const ctx = data.kind === 'meteor' ? meteorContext : context;
-        if (target.width !== data.bitmap.width) target.width = data.bitmap.width;
-        if (target.height !== data.bitmap.height) target.height = data.bitmap.height;
-        ctx.transferFromImageBitmap(data.bitmap);
-        send({ type: 'presented', kind: data.kind });
-      }
-      else if (data.type === 'ready') { canvas.style.opacity = '1'; host.classList.add('has-webgl'); }
+      if (stopped) return;
+      if (data.type === 'ready') { canvas.style.opacity = '1'; host.classList.add('has-webgl'); }
       else if (data.type === 'unavailable') dispose();
       else if (data.type === 'intro') {
         if (!data.value) { clearIntro(); return; }
@@ -60,8 +52,9 @@ export function mountScene(host, hero, kind, reduced) {
       }
     });
     const size = dimensions();
-    worker.postMessage({ type: 'init', kind, ...size,
-      hero: { ...size.hero, introPlayed, forceIntro: new URLSearchParams(location.search).get('intro') === '1' } });
+    worker.postMessage({ type: 'init', kind, host: { ...size.host, canvas: surface },
+      hero: { ...size.hero, canvas: entranceSurface, introPlayed, forceIntro: new URLSearchParams(location.search).get('intro') === '1' } },
+      entranceSurface ? [surface, entranceSurface] : [surface]);
     host.addEventListener('orbital-input', onInput); document.addEventListener('visibilitychange', onVisibility);
     resize.observe(host); visibility.observe(host);
   } catch { dispose(); }

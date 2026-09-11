@@ -1,3 +1,4 @@
+import { batchStaticMeshes } from './static-batches.js';
 import * as THREE from './assets/vendor/three.module.min.js';
 import { createStage } from './observatory-stage.js?v=3';
 import { createStudents } from './globe-students.js?v=3';
@@ -203,6 +204,7 @@ export async function mountObservatory(host, reduced, signal) {
     textures.forEach(map=>map.dispose());
     images.forEach(image=>image.value.close());
   });
+  batchStaticMeshes(model);
   await stage.start();
   if (signal.aborted || !host.isConnected) { stage.dispose(); return; }
   return stage.dispose;

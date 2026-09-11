@@ -9,7 +9,7 @@ class SceneHost extends EventTarget {
 let host, cleanup;
 self.addEventListener('message', async ({ data }) => {
   if (data.type === 'init') {
-    host = new SceneHost(); Object.assign(host, data); host.canvas = new OffscreenCanvas(data.width, data.height);
+    host = new SceneHost(); Object.assign(host, data);
     try {
       cleanup = await mountObservatory(host, { matches: data.reduced }, new AbortController().signal);
       self.postMessage({ type: cleanup ? 'ready' : 'unavailable' });
@@ -21,7 +21,6 @@ self.addEventListener('message', async ({ data }) => {
     Object.assign(host, data); host.dispatchEvent(new Event('resize'));
   } else if (data.type === 'visibility' && host) {
     host.visible = data.visible; host.dispatchEvent(new Event('visibility'));
-  } else if (data.type === 'frame-presented' && host) host.framePending = false;
-  else if (data.type === 'scroll' && host) host.scrollY = data.y;
+  } else if (data.type === 'scroll' && host) host.scrollY = data.y;
   else if (data.type === 'dispose') { host.isConnected = false; cleanup?.(); self.close(); }
 });

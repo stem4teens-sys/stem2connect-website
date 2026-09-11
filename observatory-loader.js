@@ -18,7 +18,7 @@
       };
       const queue = () => {
         if (document.readyState === 'loading' || document.hidden || idle !== undefined || timer) return;
-        if ('requestIdleCallback' in window) idle = requestIdleCallback(finish, { timeout: 1000 });
+        if ('requestIdleCallback' in window) idle = requestIdleCallback(finish, { timeout: 250 });
         else timer = setTimeout(finish, 80);
       };
       signal.addEventListener('abort', finish, { once: true });
@@ -54,18 +54,11 @@
     element.append(poster);
     host = element; hero.append(element);
     try {
-      // Let the existing text entrance finish before sharing the GPU with 3D.
-      await new Promise(resolve => setTimeout(resolve, 1600));
-      if (signal.aborted) return;
-      const entrances = document.getAnimations().filter(animation =>
-        Number.isFinite(animation.effect?.getComputedTiming().endTime));
-      await Promise.allSettled(entrances.map(animation => animation.finished));
-      if (signal.aborted) return;
       await whenIdle(signal);
       if (signal.aborted) return;
       await whenVisible(element, signal);
       if (signal.aborted) return;
-      const module = await import(new URL('observatory-client.js?v=4', source).href);
+      const module = await import(new URL('observatory-client.js?v=5', source).href);
       if (current !== generation) return;
       const dispose = await module.mountObservatory(element, reduced, signal);
       if (current !== generation) { dispose?.(); return; }

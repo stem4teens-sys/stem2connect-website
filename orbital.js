@@ -1,3 +1,4 @@
+import { batchStaticMeshes } from './static-batches.js';
 import * as THREE from './assets/vendor/three.module.min.js';
 import { createStage, lighting } from './three-stage.js';
 
@@ -100,6 +101,7 @@ export async function mountOrbital(machine, hero, reduced) {
   };
   machine.classList.add('has-webgl');
   stage.onDispose(() => { entranceCleanup?.(); finishEntrance(); machine.classList.remove('has-webgl'); });
+  batchStaticMeshes(processor);
   await stage.start();
   return stage.dispose;
 }
@@ -111,6 +113,7 @@ function meteorEntrance(hero, machine, impact, finish) {
   let renderer;
   try { renderer = new THREE.WebGLRenderer({ canvas: background ? hero.canvas : undefined, alpha: true, antialias: false, powerPreference: 'low-power' }); }
   catch { finish(); return () => {}; }
+  renderer.debug.checkShaderErrors = false;
   renderer.setPixelRatio(Math.min(background ? hero.dpr : devicePixelRatio, 1));
   const canvas = renderer.domElement; if (!background) { canvas.className = 'meteor-canvas'; canvas.setAttribute('aria-hidden', 'true'); }
   const skip = background ? hero.skip : document.createElement('button'); skip.type = 'button'; skip.className = 'intro-skip'; skip.textContent = 'Skip animation';
@@ -158,7 +161,8 @@ function meteorEntrance(hero, machine, impact, finish) {
       const q = Math.min((age - 900) / 1050, 1);
       ripple.position.copy(target); ripple.scale.setScalar(12 + q * Math.min(width, 650)); ripple.material.opacity = (1 - q) * .5;
     }
-    if (!hero.framePending) { renderer.render(scene, camera); if (background) renderer.getContext().finish(); hero.present?.(); }
+    renderer.render(scene, camera);
+    if (hero.flushFrames) renderer.getContext().flush();
     raf = requestAnimationFrame(draw);
   }
   raf = requestAnimationFrame(draw);

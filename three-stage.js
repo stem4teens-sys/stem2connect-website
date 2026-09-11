@@ -9,8 +9,9 @@ export function createStage(host, className, reduced) {
   try {
     renderer = new THREE.WebGLRenderer({ canvas: background ? host.canvas : undefined, alpha: true, antialias: !coarse, powerPreference: 'low-power' });
   } catch { return null; }
+  renderer.debug.checkShaderErrors = false;
   renderer.setClearColor(0x000000, 0);
-  renderer.setPixelRatio(Math.min(background ? host.dpr : devicePixelRatio, coarse ? 1 : 1.25));
+  let resolution = coarse ? 1 : 1.25, sizedWidth = 0, sizedHeight = 0, sizedRatio = 0;
   const canvas = renderer.domElement;
   if (!background) { canvas.className = className; canvas.setAttribute('aria-hidden', 'true'); host.prepend(canvas); }
   const scene = new THREE.Scene();
@@ -25,9 +26,12 @@ export function createStage(host, className, reduced) {
     if (stopped) return;
     stage.width = Math.max(1, host.clientWidth);
     stage.height = Math.max(1, host.clientHeight);
+    const ratio = Math.min(background ? host.dpr : devicePixelRatio, resolution);
+    if (stage.width === sizedWidth && stage.height === sizedHeight && ratio === sizedRatio) return;
+    sizedWidth = stage.width; sizedHeight = stage.height; sizedRatio = ratio;
     camera.aspect = stage.width / stage.height;
     camera.updateProjectionMatrix();
-    renderer.setSize(stage.width, stage.height, false);
+    renderer.setDrawingBufferSize(stage.width, stage.height, ratio);
     stage.resize();
     resume();
   }
@@ -35,14 +39,14 @@ export function createStage(host, className, reduced) {
     frame = 0;
     if (stopped || !visible || (!background && document.hidden) || reduced.matches) { last = 0; return; }
     frame = requestAnimationFrame(draw);
-    if ((background && host.framePending) || (last && now - last < 32)) return;
+    if ((last && now - last < 32)) return;
     const dt = last ? Math.min((now - last) / 1000, .08) : 0;
     if (last && ++samples < 100 && now - last > 54) slowFrames++;
-    if (samples === 100 && slowFrames > 25) renderer.setPixelRatio(1);
+    if (samples === 100 && slowFrames > 25 && resolution > 1) { resolution = 1; resize(); }
     last = now;
     elapsed += dt;
     stage.draw({ now, elapsed, dt });
-    if (!stopped) { renderer.render(scene, camera); if (background) renderer.getContext().finish(); host.present?.(); if (firstFrame) { firstFrame = false; host.onFrame?.(); } }
+    if (!stopped) { renderer.render(scene, camera); if (host.flushFrames) renderer.getContext().flush(); if (firstFrame) { firstFrame = false; host.onFrame?.(); } }
   }
   function resume() { if (prepared && !frame && !stopped) frame = requestAnimationFrame(draw); }
   const observer = background ? null : new IntersectionObserver(entries => { visible = entries[0].isIntersecting; if (visible) resume(); }, { threshold: .08 });
@@ -54,7 +58,9 @@ export function createStage(host, className, reduced) {
   if (background) { host.addEventListener('resize', resize); host.addEventListener('visibility', visibility); visible = host.visible; }
   else document.addEventListener('visibilitychange', visibility);
   async function start() {
-    renderer.compile(scene, camera);
+    const compilation = renderer.compileAsync(scene, camera);
+    renderer.getContext().flush();
+    await compilation;
     if (!stopped) { prepared = true; resume(); }
   }
   function dispose() {
@@ -68,6 +74,7 @@ export function createStage(host, className, reduced) {
     callbacks.forEach(fn => fn());
     const resources = new Set();
     scene.traverse(object => {
+      if (object.isInstancedMesh) object.dispose();
       if (object.geometry) resources.add(object.geometry);
       if (object.material) (Array.isArray(object.material) ? object.material : [object.material]).forEach(material => resources.add(material));
     });
