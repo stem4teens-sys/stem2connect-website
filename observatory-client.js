@@ -1,9 +1,21 @@
 // This small bridge is the only globe module evaluated on the page itself.
+export function showStaticObservatory(host) {
+  if (host.querySelector('.observatory-poster')) return;
+  host.classList.remove('has-live-scene', 'is-ready');
+  host.classList.add('is-static');
+  host.removeAttribute('tabindex');
+  host.removeAttribute('aria-busy');
+  host.setAttribute('aria-label', 'Globe illustrating students learning and connecting around the world.');
+  const poster = document.createElement('img');
+  poster.className = 'observatory-poster'; poster.alt = ''; poster.decoding = 'async';
+  poster.addEventListener('load', () => host.classList.add('is-ready'), { once: true });
+  poster.src = new URL('./assets/models/globe-poster.webp', import.meta.url).href;
+  host.append(poster);
+}
+
 export async function mountObservatory(host, reduced, signal) {
-  const makeStatic = () => {
-    host.classList.remove('has-live-scene'); host.classList.add('is-static'); host.removeAttribute('tabindex');
-    host.setAttribute('aria-label', 'Globe illustrating students learning and connecting around the world.');
-  };
+  if (signal.aborted) return () => {};
+  const makeStatic = () => showStaticObservatory(host);
   if (!('Worker' in window) || !('OffscreenCanvas' in window) || !HTMLCanvasElement.prototype.transferControlToOffscreen || reduced.matches) {
     makeStatic(); return () => {};
   }
@@ -48,18 +60,23 @@ export async function mountObservatory(host, reduced, signal) {
     signal.removeEventListener('abort', dispose); canvas.remove();
   };
   const unavailable = () => {
+    if (stopped) return;
     dispose(); makeStatic();
   };
-  // Keep the poster visible while slow graphics prepare, without interrupting the page.
-  startup = setTimeout(() => host.classList.add('is-static'), 12000);
+  // A stalled renderer falls back once; a preview never replaces normal startup.
+  startup = setTimeout(unavailable, 20000);
   worker.addEventListener('error', unavailable, { once: true });
   worker.addEventListener('message', ({ data }) => {
     if (data.type === 'painted') {
       if (stopped) return;
       clearTimeout(startup);
       host.classList.remove('is-static');
-      host.classList.add('has-live-scene');
+      host.removeAttribute('aria-busy');
+      host.tabIndex = 0;
+      host.classList.add('has-live-scene', 'is-ready');
     }
+    // A prepared scene may be offscreen; keep it ready for the next scroll back.
+    else if (data.type === 'ready') clearTimeout(startup);
     else if (data.type === 'unavailable') unavailable();
   });
   worker.postMessage({ type: 'init', canvas: surface, transferTextures: true, width: host.clientWidth, height: host.clientHeight, visible: !document.hidden, reduced: reduced.matches }, [surface]);

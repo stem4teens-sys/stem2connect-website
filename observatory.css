@@ -11,19 +11,18 @@
     transform: translateY(-50%);
     z-index: 1;
     opacity: 0;
-    cursor: grab;
+    cursor: default;
+    pointer-events: none;
     touch-action: pan-y;
     border-radius: 45%;
     transition: opacity .45s ease;
   }
   .world-observatory.is-ready { opacity: 1; }
-  .world-observatory:active { cursor: grabbing; }
+  .world-observatory.has-live-scene { cursor: grab; pointer-events: auto; }
+  .world-observatory.has-live-scene:active { cursor: grabbing; }
   .world-observatory:focus-visible { outline: 2px solid rgba(170,0,0,.45); outline-offset: -12px; }
   .observatory-canvas, .observatory-poster { position: absolute; inset: 0; display: block; width: 100%; height: 100%; pointer-events: none; }
-  .observatory-canvas { opacity: 0; transition: opacity .3s ease; }
-  .observatory-poster { object-fit: contain; transition: opacity .3s ease; }
-  .has-live-scene .observatory-canvas { opacity: 1; }
-  .has-live-scene .observatory-poster { opacity: 0; }
+  .observatory-poster { object-fit: contain; }
   .world-observatory.is-static { cursor: default; }
 }
 @media (prefers-reduced-motion: reduce) { .world-observatory { transition: none; } }

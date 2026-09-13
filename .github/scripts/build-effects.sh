@@ -2,6 +2,7 @@
 # GitHub Actions rebuilds only the added visual enhancements.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
+node .github/scripts/check-globe-startup.mjs
 npm exec --yes --package=esbuild@0.28.2 -- esbuild \
   graphics-worker.js edge-decorations.js --bundle --format=esm \
   --minify --target=es2022 --outdir=assets/runtime \
