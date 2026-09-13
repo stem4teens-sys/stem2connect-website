@@ -2,6 +2,9 @@
 # GitHub Actions rebuilds only the added visual enhancements.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
+npm ci --prefix .github/image-tools --ignore-scripts --no-audit --no-fund
+node .github/scripts/build-images.cjs
+python3 .github/scripts/check-images.py
 node .github/scripts/check-globe-startup.mjs
 npm exec --yes --package=esbuild@0.28.2 -- esbuild \
   graphics-worker.js edge-decorations.js --bundle --format=esm \

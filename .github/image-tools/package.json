@@ -1,0 +1,8 @@
+{
+  "name": "stem2connect-image-build",
+  "private": true,
+  "version": "1.0.0",
+  "dependencies": {
+    "sharp": "0.35.4"
+  }
+}

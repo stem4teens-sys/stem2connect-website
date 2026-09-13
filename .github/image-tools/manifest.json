@@ -1,0 +1,328 @@
+{
+  "assets/discord_red_symbol.png": {
+    "sourceHash": "c4407bdaddd7148af53670dea917321b875f375b30826997a45ff2fb3c54a099",
+    "sourceBytes": 371133,
+    "width": 1254,
+    "height": 1254,
+    "display": 22,
+    "candidates": [
+      {
+        "path": "assets/optimized/discord_red_symbol-96-1866f374af66.webp",
+        "width": 96,
+        "height": 96,
+        "bytes": 5914
+      }
+    ]
+  },
+  "assets/discord_green_symbol.png": {
+    "sourceHash": "e886d14c4adeb77274d57f56ba27ffd2ac53e669ea04dafbd62e398a49e24e49",
+    "sourceBytes": 328274,
+    "width": 1254,
+    "height": 1254,
+    "display": 22,
+    "candidates": [
+      {
+        "path": "assets/optimized/discord_green_symbol-96-59412a15b512.webp",
+        "width": 96,
+        "height": 96,
+        "bytes": 5626
+      }
+    ]
+  },
+  "assets/events_symbol.png": {
+    "sourceHash": "5b55dea5ccaca97ded1c7afca02cdd30d34eec91e6e2666776bd513a6e443e02",
+    "sourceBytes": 408762,
+    "width": 1254,
+    "height": 1254,
+    "display": 22,
+    "candidates": [
+      {
+        "path": "assets/optimized/events_symbol-96-1589655964fa.webp",
+        "width": 96,
+        "height": 96,
+        "bytes": 6832
+      }
+    ]
+  },
+  "assets/watch_symbol.png": {
+    "sourceHash": "2156d8a68af4aa1a4e1ec0b6badb1e86362714e62761583c5af8bbb783a2eb12",
+    "sourceBytes": 424914,
+    "width": 1254,
+    "height": 1254,
+    "display": 22,
+    "candidates": [
+      {
+        "path": "assets/optimized/watch_symbol-96-35685b00ae35.webp",
+        "width": 96,
+        "height": 96,
+        "bytes": 5084
+      }
+    ]
+  },
+  "assets/sparkle_symbol.png": {
+    "sourceHash": "e8360cd290d86098075e6a50e7c6b25eaf03bae647ef9cb6ebfa20696b448a28",
+    "sourceBytes": 253408,
+    "width": 1254,
+    "height": 1254,
+    "display": 42,
+    "candidates": [
+      {
+        "path": "assets/optimized/sparkle_symbol-144-839192bf777f.webp",
+        "width": 144,
+        "height": 144,
+        "bytes": 8770
+      }
+    ]
+  },
+  "assets/compass_symbol.png": {
+    "sourceHash": "3070e473c0702dde889387a9127b52ba3cdf4a4b4173d237e2bb3a11e5c39b14",
+    "sourceBytes": 270344,
+    "width": 1254,
+    "height": 1254,
+    "display": 42,
+    "candidates": [
+      {
+        "path": "assets/optimized/compass_symbol-144-e0462ada9e0e.webp",
+        "width": 144,
+        "height": 144,
+        "bytes": 9282
+      }
+    ]
+  },
+  "assets/growth_symbol.png": {
+    "sourceHash": "0954d6781b6c51b7d93180594b3f41db2d542dc36e7621ef455f05c25db595f5",
+    "sourceBytes": 276923,
+    "width": 1254,
+    "height": 1254,
+    "display": 42,
+    "candidates": [
+      {
+        "path": "assets/optimized/growth_symbol-144-b2ce87aa5dff.webp",
+        "width": 144,
+        "height": 144,
+        "bytes": 10246
+      }
+    ]
+  },
+  "assets/cryptology.png": {
+    "sourceHash": "0a22dad21c10897ede9df723c35317d13d911c1f34521e32b39e7a01c3eef5d6",
+    "sourceBytes": 420662,
+    "width": 1254,
+    "height": 1254,
+    "display": 70,
+    "candidates": [
+      {
+        "path": "assets/optimized/cryptology-224-e294c3e1545c.webp",
+        "width": 224,
+        "height": 224,
+        "bytes": 24336
+      }
+    ]
+  },
+  "assets/spotlight_webinar_symbol.png": {
+    "sourceHash": "04d7f48e14ab49b9347e18dbf817671c25bfa3383b48ac32aa5ab54855f645c2",
+    "sourceBytes": 410763,
+    "width": 1254,
+    "height": 1254,
+    "display": 70,
+    "candidates": [
+      {
+        "path": "assets/optimized/spotlight_webinar_symbol-224-dadd47605dda.webp",
+        "width": 224,
+        "height": 224,
+        "bytes": 25062
+      }
+    ]
+  },
+  "assets/ai_webinar_symbol.png": {
+    "sourceHash": "c5776a76bab4e541298c64716e9dd92717f16223225937bdfbdd3a6a67e9e28a",
+    "sourceBytes": 372836,
+    "width": 1254,
+    "height": 1254,
+    "display": 70,
+    "candidates": [
+      {
+        "path": "assets/optimized/ai_webinar_symbol-224-9ad281021d59.webp",
+        "width": 224,
+        "height": 224,
+        "bytes": 21650
+      }
+    ]
+  },
+  "assets/hums_logo.jpg": {
+    "sourceHash": "6674b9d86a978e7437b442f4abd52c27d8d4e45d95d17a157850c601a15f8ef3",
+    "sourceBytes": 90229,
+    "width": 1024,
+    "height": 1024,
+    "display": 82,
+    "candidates": [
+      {
+        "path": "assets/optimized/hums_logo-256-061adc54c18e.webp",
+        "width": 256,
+        "height": 256,
+        "bytes": 38012
+      }
+    ]
+  },
+  "assets/andrea.png": {
+    "sourceHash": "9acfd8cea4e3aa1e3b2b76e8d298d03d9e3cb71a2521dd0607f5ac83262233b0",
+    "sourceBytes": 298898,
+    "width": 412,
+    "height": 442,
+    "display": 96,
+    "candidates": [
+      {
+        "path": "assets/optimized/andrea-192-d12b106e8056.webp",
+        "width": 192,
+        "height": 206,
+        "bytes": 53172
+      },
+      {
+        "path": "assets/optimized/andrea-288-8c93bd493aa7.webp",
+        "width": 288,
+        "height": 309,
+        "bytes": 103798
+      }
+    ]
+  },
+  "assets/anna.png": {
+    "sourceHash": "3d0f2680ea51f5f982cc355fc1fe483f4ee494edd7b2c1cfd5b4d40b8b35f928",
+    "sourceBytes": 264888,
+    "width": 415,
+    "height": 477,
+    "display": 96,
+    "candidates": [
+      {
+        "path": "assets/optimized/anna-192-df2403faacd0.webp",
+        "width": 192,
+        "height": 221,
+        "bytes": 44538
+      },
+      {
+        "path": "assets/optimized/anna-288-18150c31b78e.webp",
+        "width": 288,
+        "height": 331,
+        "bytes": 89396
+      }
+    ]
+  },
+  "assets/adelaide.png": {
+    "sourceHash": "ced6677706b94c091064e109695d378dd9b9c061fb87064e83e7c970f0b2bf6a",
+    "sourceBytes": 339261,
+    "width": 490,
+    "height": 505,
+    "display": 96,
+    "candidates": [
+      {
+        "path": "assets/optimized/adelaide-192-ee9296bdce6b.webp",
+        "width": 192,
+        "height": 198,
+        "bytes": 42414
+      },
+      {
+        "path": "assets/optimized/adelaide-288-8c481079048a.webp",
+        "width": 288,
+        "height": 297,
+        "bytes": 86768
+      }
+    ]
+  },
+  "assets/bernice.png": {
+    "sourceHash": "a7793906feb982b465bc2c72a598e533f102b14b782739ece5827bf8d1c9a55f",
+    "sourceBytes": 460364,
+    "width": 496,
+    "height": 616,
+    "display": 96,
+    "candidates": [
+      {
+        "path": "assets/optimized/bernice-192-c140294ff1fa.webp",
+        "width": 192,
+        "height": 238,
+        "bytes": 55894
+      },
+      {
+        "path": "assets/optimized/bernice-288-0c68df57e28d.webp",
+        "width": 288,
+        "height": 358,
+        "bytes": 112794
+      }
+    ]
+  },
+  "assets/rafael.png": {
+    "sourceHash": "1a083c146696d10b58655abbb1c7324447d39b6c9c82d2c26aab9e8954152caa",
+    "sourceBytes": 234568,
+    "width": 450,
+    "height": 384,
+    "display": 96,
+    "candidates": [
+      {
+        "path": "assets/optimized/rafael-225-7f2a0a63144d.webp",
+        "width": 225,
+        "height": 192,
+        "bytes": 47072
+      },
+      {
+        "path": "assets/optimized/rafael-338-4cec358da1d8.webp",
+        "width": 338,
+        "height": 288,
+        "bytes": 89504
+      }
+    ]
+  },
+  "assets/rylan.png": {
+    "sourceHash": "0e79164f1aa0600f12151f4a1bb23b924adc730f9cff5ba215ce5b9be526358b",
+    "sourceBytes": 318743,
+    "width": 454,
+    "height": 456,
+    "display": 96,
+    "candidates": [
+      {
+        "path": "assets/optimized/rylan-192-bdef03da4d66.webp",
+        "width": 192,
+        "height": 193,
+        "bytes": 49418
+      },
+      {
+        "path": "assets/optimized/rylan-288-1fbf3aec6dc7.webp",
+        "width": 288,
+        "height": 289,
+        "bytes": 103242
+      }
+    ]
+  },
+  "assets/hadia.png": {
+    "sourceHash": "3a3af6c7d3dd0e6285ca55be5cba4315f220e8461f9a9ed0ba79915a9903676f",
+    "sourceBytes": 445438,
+    "width": 549,
+    "height": 478,
+    "display": 96,
+    "candidates": [
+      {
+        "path": "assets/optimized/hadia-221-7dd1298238ea.webp",
+        "width": 221,
+        "height": 192,
+        "bytes": 53548
+      },
+      {
+        "path": "assets/optimized/hadia-331-1da27bfff46b.webp",
+        "width": 331,
+        "height": 288,
+        "bytes": 111398
+      }
+    ]
+  },
+  "assets/favicon.png": {
+    "sourceHash": "d067cdff2d1460f61d2f7d8f73f5c2c2139242e0a4008981a8c45cbb42d9f68c",
+    "sourceBytes": 286537,
+    "width": 1024,
+    "height": 1024,
+    "candidates": [
+      {
+        "path": "assets/optimized/favicon-96-25c9d480dc3a.png",
+        "width": 96,
+        "height": 96,
+        "bytes": 7498
+      }
+    ]
+  }
+}
