@@ -13,7 +13,7 @@ export async function mountObservatory(host, reduced, signal) {
   try { surface = canvas.transferControlToOffscreen(); }
   catch { canvas.remove(); makeStatic(); return () => {}; }
   let worker;
-  try { worker = new Worker(new URL('./assets/runtime/observatory-worker.js?v=6', import.meta.url), { type: 'module' }); }
+  try { worker = new Worker(new URL('./assets/runtime/graphics-worker.js?v=1', import.meta.url), { type: 'module' }); }
   catch { canvas.remove(); makeStatic(); return () => {}; }
   let stopped = false, inView = true, pointerFrame = 0, pointer, scrollFrame = 0, startup;
   const textureRequest = new AbortController();

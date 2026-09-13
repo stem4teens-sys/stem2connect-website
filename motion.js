@@ -352,7 +352,7 @@
       // Start after the first layout; direct worker rendering keeps input independent.
       setTimeout(() => {
         if (reduced.matches || generation !== sceneGeneration) return;
-        import(new URL('scene-client.js?v=5', scriptURL).href).then(module => {
+        import(new URL('scene-client.js?v=6', scriptURL).href).then(module => {
           if (reduced.matches || generation !== sceneGeneration) return;
           cleanups.push(module.mountScene(host, hero, machine ? 'orbital' : 'molecules', reduced));
           requestUpdate();

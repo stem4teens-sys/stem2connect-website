@@ -28,7 +28,7 @@ export function mountScene(host, hero, kind, reduced) {
     canvas.remove(); meteor?.remove(); host.classList.remove('has-webgl'); clearIntro();
   }
   try {
-    worker = new Worker(new URL('./assets/runtime/scene-worker.js?v=5', import.meta.url), { type: 'module' });
+    worker = new Worker(new URL('./assets/runtime/graphics-worker.js?v=1', import.meta.url), { type: 'module' });
     host.prepend(canvas); if (meteor) hero.append(meteor);
     // Transfer ownership once. The browser composites the worker canvas directly.
     const surface = canvas.transferControlToOffscreen();
