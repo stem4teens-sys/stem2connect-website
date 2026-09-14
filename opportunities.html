@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Discover STEM opportunities that match a student's interests, age, budget, schedule, and support needs."
+    />
+    <title>Opportunities | STEM2Connect</title>
+    <link rel="icon" type="image/png" href="assets/optimized/favicon-96-25c9d480dc3a.png" data-source-href="assets/favicon.png" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="opportunities.js" defer></script>
+  </head>
+  <body>
+    <header class="site-header" id="top">
+      <nav class="navbar" aria-label="Main navigation">
+        <a class="brand" href="index.html" aria-label="STEM2Connect home">
+          <img src="assets/logo.jpg" alt="STEM2Connect logo" class="brand-logo" />
+          <span class="brand-name">STEM2Connect</span>
+        </a>
+
+        <button class="nav-toggle" id="navToggle" type="button" aria-label="Open navigation menu" aria-controls="navLinks" aria-expanded="false">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <ul class="nav-links" id="navLinks">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="index.html#about">About</a></li>
+          <li><a href="index.html#what-we-do">What We Do</a></li>
+          <li><a href="hackathon/">Hackathon</a></li>
+          <li><a href="resources/">Resources</a></li>
+          <li><a href="resources/#games">Games</a></li>
+          <li><a href="opportunities.html" class="nav-button">Opportunities</a></li>
+          <li><a href="index.html#events">Events</a></li>
+          <li><a href="index.html#team">Team</a></li>
+          <li><a href="index.html#join">Join</a></li>
+          <li><a href="index.html#contact">Contact</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <section class="page-hero discover-hero">
+        <div class="container discover-header">
+          <p class="eyebrow">Opportunity discovery</p>
+          <h1>Find the right STEM opportunity for every student.</h1>
+          <p class="hero-subtitle">
+            Match students to research, coding, leadership, and community programs based on their interests,
+            age, schedule, and support needs.
+          </p>
+        </div>
+      </section>
+
+      <section class="section compact-section">
+        <div class="container opportunity-layout">
+          <aside class="finder-panel">
+            <form id="program-form" class="finder-form" aria-label="Program matching form">
+              <div class="field-group">
+                <label>Student interests</label>
+                <div class="chip-grid" data-interest-selector>
+                  <button type="button" class="chip" data-value="robotics">Robotics</button>
+                  <button type="button" class="chip" data-value="coding">Coding</button>
+                  <button type="button" class="chip" data-value="science">Science</button>
+                  <button type="button" class="chip" data-value="design">Design</button>
+                  <button type="button" class="chip" data-value="music">Music</button>
+                  <button type="button" class="chip" data-value="sports">Sports</button>
+                  <button type="button" class="chip" data-value="outdoors">Outdoors</button>
+                  <button type="button" class="chip" data-value="leadership">Leadership</button>
+                  <button type="button" class="chip" data-value="community">Community</button>
+                  <button type="button" class="chip" data-value="environment">Environment</button>
+                  <button type="button" class="chip" data-value="making">Making</button>
+                  <button type="button" class="chip" data-value="writing">Writing</button>
+                  <button type="button" class="chip" data-value="business">Business</button>
+                  <button type="button" class="chip" data-value="research">Research</button>
+                </div>
+              </div>
+
+              <div class="field-grid">
+                <div class="field-group">
+                  <label for="age-range">Age range</label>
+                  <select id="age-range" name="age-range">
+                    <option value="all">Any age</option>
+                    <option value="6-8">6 to 8</option>
+                    <option value="9-12">9 to 12</option>
+                    <option value="13-15">13 to 15</option>
+                    <option value="16-18">16 to 18</option>
+                  </select>
+                </div>
+
+                <div class="field-group">
+                  <label for="budget">Budget</label>
+                  <select id="budget" name="budget">
+                    <option value="all">Any budget</option>
+                    <option value="free">Free</option>
+                    <option value="low">Low cost</option>
+                    <option value="moderate">Moderate</option>
+                    <option value="scholarship">Scholarships available</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="field-grid">
+                <div class="field-group">
+                  <label for="timing">Program timing</label>
+                  <select id="timing" name="timing">
+                    <option value="all">Any timing</option>
+                    <option value="after-school">After-school</option>
+                    <option value="weekend">Weekend</option>
+                    <option value="summer">Summer</option>
+                    <option value="club">Community club</option>
+                  </select>
+                </div>
+
+                <div class="field-group">
+                  <label for="support">Support needs</label>
+                  <select id="support" name="support">
+                    <option value="all">Any support</option>
+                    <option value="mentoring">Mentoring</option>
+                    <option value="team">Team-based</option>
+                    <option value="beginner">Beginner-friendly</option>
+                    <option value="leader">Leadership development</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="field-group">
+                <label for="notes">What does the student enjoy most?</label>
+                <textarea id="notes" name="notes" rows="4" placeholder="Example: Loves design, wants a team setting, and prefers affordable local options."></textarea>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="button button-primary">Find matches</button>
+                <button type="reset" class="button button-secondary" id="clear-button">Clear</button>
+              </div>
+            </form>
+          </aside>
+
+          <section class="results-panel" aria-live="polite">
+            <div class="results-header">
+              <div>
+                <p class="eyebrow">Recommended opportunities</p>
+                <h2>Best-fit programs</h2>
+              </div>
+            </div>
+
+            <div id="result-state" class="result-state">Select a few interests to see recommendations.</div>
+            <div id="results" class="results-list"></div>
+          </section>
+        </div>
+      </section>
+
+      <section class="section compact-section">
+        <div class="container map-layout">
+          <aside class="finder-panel compact-panel">
+            <form id="map-form" class="finder-form" aria-label="Map filter form">
+              <div class="field-group">
+                <label for="map-interest">Interest</label>
+                <select id="map-interest" name="map-interest">
+                  <option value="all">All interests</option>
+                  <option value="robotics">Robotics</option>
+                  <option value="coding">Coding</option>
+                  <option value="science">Science</option>
+                  <option value="design">Design</option>
+                  <option value="music">Music</option>
+                  <option value="sports">Sports</option>
+                  <option value="outdoors">Outdoors</option>
+                  <option value="community">Community</option>
+                  <option value="writing">Writing</option>
+                  <option value="business">Business</option>
+                  <option value="leadership">Leadership</option>
+                </select>
+              </div>
+
+              <div class="field-group">
+                <label for="map-age">Age range</label>
+                <select id="map-age" name="map-age">
+                  <option value="all">All ages</option>
+                  <option value="6-8">6 to 8</option>
+                  <option value="9-12">9 to 12</option>
+                  <option value="13-15">13 to 15</option>
+                  <option value="16-18">16 to 18</option>
+                </select>
+              </div>
+
+              <button type="submit" class="button button-primary full-width">Update map view</button>
+            </form>
+          </aside>
+
+          <section class="results-panel map-panel">
+            <div class="map-stage" aria-label="Community opportunity map">
+              <div class="map-grid"></div>
+              <button type="button" class="map-pin" data-id="1" style="left:25%; top:30%;">1</button>
+              <button type="button" class="map-pin" data-id="2" style="left:45%; top:58%;">2</button>
+              <button type="button" class="map-pin" data-id="3" style="left:63%; top:38%;">3</button>
+              <button type="button" class="map-pin" data-id="4" style="left:30%; top:75%;">4</button>
+              <button type="button" class="map-pin" data-id="5" style="left:52%; top:42%;">5</button>
+              <button type="button" class="map-pin" data-id="6" style="left:72%; top:68%;">6</button>
+              <button type="button" class="map-pin" data-id="7" style="left:48%; top:50%;">7</button>
+              <button type="button" class="map-pin" data-id="8" style="left:38%; top:60%;">8</button>
+              <button type="button" class="map-pin" data-id="9" style="left:58%; top:72%;">9</button>
+              <button type="button" class="map-pin" data-id="10" style="left:66%; top:26%;">10</button>
+            </div>
+            <div class="map-notice-wrap">
+              <p id="map-notice" class="map-notice">Showing nearby opportunities.</p>
+            </div>
+            <div id="map-results" class="map-results"></div>
+          </section>
+        </div>
+      </section>
+
+      <section class="section compact-section">
+        <div class="container">
+          <div class="form-shell">
+            <form id="opportunity-form" class="opportunity-form">
+              <div class="field-grid two-up">
+                <div class="field-group">
+                  <label for="program-name">Program name</label>
+                  <input id="program-name" type="text" placeholder="Example: After-school robotics club" required />
+                </div>
+                <div class="field-group">
+                  <label for="org-name">Organization or school</label>
+                  <input id="org-name" type="text" placeholder="Organization name" required />
+                </div>
+              </div>
+
+              <div class="field-grid two-up">
+                <div class="field-group">
+                  <label for="category">Category</label>
+                  <select id="category" required>
+                    <option value="">Select one</option>
+                    <option>STEM</option>
+                    <option>Arts</option>
+                    <option>Sports</option>
+                    <option>Music</option>
+                    <option>Leadership</option>
+                    <option>Outdoors</option>
+                    <option>Community</option>
+                  </select>
+                </div>
+                <div class="field-group">
+                  <label for="age-group">Age group</label>
+                  <select id="age-group" required>
+                    <option value="">Select one</option>
+                    <option>6 to 8</option>
+                    <option>9 to 12</option>
+                    <option>13 to 15</option>
+                    <option>16 to 18</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="field-grid two-up">
+                <div class="field-group">
+                  <label for="location-name">Location</label>
+                  <input id="location-name" type="text" placeholder="Neighborhood or city" required />
+                </div>
+                <div class="field-group">
+                  <label for="program-link">Registration link</label>
+                  <input id="program-link" type="url" placeholder="https://example.org" required />
+                </div>
+              </div>
+
+              <div class="field-group">
+                <label for="program-description">Description</label>
+                <textarea id="program-description" rows="5" placeholder="Describe the opportunity, who it serves, and how students can join." required></textarea>
+              </div>
+
+              <div class="field-grid two-up">
+                <div class="field-group">
+                  <label for="cost">Cost</label>
+                  <select id="cost">
+                    <option>Free</option>
+                    <option>Low cost</option>
+                    <option>Moderate cost</option>
+                    <option>Scholarship available</option>
+                  </select>
+                </div>
+                <div class="field-group">
+                  <label for="format">Format</label>
+                  <select id="format">
+                    <option>After-school</option>
+                    <option>Weekend</option>
+                    <option>Summer</option>
+                    <option>Community club</option>
+                  </select>
+                </div>
+              </div>
+
+              <button type="submit" class="button button-primary">Submit opportunity</button>
+              <p id="form-success" class="form-success" hidden>Thanks for submitting a new opportunity. We will review it for visibility on the platform.</p>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-grid">
+        <div>
+          <a href="index.html" class="brand brand-footer">
+            <img src="assets/logo.jpg" alt="STEM2Connect logo" class="brand-logo" />
+            <span class="brand-name">STEM2Connect</span>
+          </a>
+          <p>Helping students find STEM opportunities that are relevant, local, and accessible.</p>
+        </div>
+        <div>
+          <h3>Explore</h3>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="resources/">Resources</a></li>
+            <li><a href="hackathon/">Hackathon</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Connect</h3>
+          <ul>
+            <li><a href="index.html#join">Join the community</a></li>
+            <li><a href="index.html#events">Events</a></li>
+            <li><a href="index.html#contact">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="container footer-bottom">
+        <p>© <span id="year"></span> STEM2Connect. All rights reserved.</p>
+      </div>
+    </footer>
+  </body>
+</html>
