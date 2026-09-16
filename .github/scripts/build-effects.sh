@@ -2,6 +2,7 @@
 # GitHub Actions rebuilds only the added visual enhancements.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
+node .github/scripts/build-opportunities.mjs
 npm ci --prefix .github/image-tools --ignore-scripts --no-audit --no-fund
 node .github/scripts/build-images.cjs
 python3 .github/scripts/check-images.py
