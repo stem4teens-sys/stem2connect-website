@@ -52,7 +52,7 @@ export const programs = [
     modes: ['campus'], season: 'summer', duration: '1 week', weeks: 1, grades: [12], minAge: null,
     cost: '$50 confirmation fee', tuitionFree: true, aid: false, price: 50,
     costNote: 'Tuition, housing, and meals are covered. Accepted students pay a $50 confirmation fee and arrange their own travel.',
-    eligibility: 'US students applying in grade 11 for the summer before grade 12. Prospective first-generation students are encouraged to apply.',
+    eligibility: 'Apply in grade 11 for the summer before grade 12. The provider lists no residency restrictions. Prospective first-generation students are encouraged to apply.',
     status: 'upcoming', cycle: '2027 dates announced', opens: '2026-10-12', deadline: 'Applications open October 12, 2026. Three one-week sessions run in June–July 2027.',
     goals: ['build', 'explore', 'college'], experience: 'beginner',
     url: 'https://undergraduate-admissions.mines.edu/summer-mines-engineering-and-training-summet/', sources: [],

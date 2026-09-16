@@ -1,4 +1,4 @@
-import { programs, reviewedOn, topicLabels, filterPrograms, rankPrograms, matchReasons } from './opportunities-data.mjs?v=2';
+import { programs, reviewedOn, topicLabels, filterPrograms, rankPrograms, matchReasons } from './opportunities-data.mjs?v=3';
 
 const $ = id => document.getElementById(id);
 const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[c]));
@@ -91,9 +91,21 @@ $('program-search').addEventListener('input', () => {readFilters(); limit = 6; r
 $('saved-filter').addEventListener('click', () => {filters.savedOnly = !filters.savedOnly; limit = 6; render();});
 $('empty-reset').addEventListener('click', clearFilters);
 $('show-more').addEventListener('click', () => {const previousCount = Math.min(limit, matches.length); limit += 6; render(); const next = $('program-results').children[previousCount]?.querySelector('[data-detail]'); next?.focus({preventScroll: true});});
-document.addEventListener('click', event => {
+document.addEventListener('click', async event => {
   const save = event.target.closest('[data-save]'); if (save) toggleSaved(save.dataset.save);
   const detail = event.target.closest('[data-detail]'); if (detail) openDetail(detail.dataset.detail);
+  const assess = event.target.closest('[data-assess]');
+  if (assess) {
+    assess.disabled = true;
+    const status = assess.parentElement.querySelector('[role=status]');
+    status.textContent = 'Opening your assessment…';
+    try {
+      const fit = await loadFitAssessment();
+      if (assess.isConnected && assess.closest('dialog').open) fit.openAssessment(programs.find(p=>p.id===assess.dataset.assess), assess);
+      status.textContent = '';
+    } catch {status.textContent = 'The assessment could not load. Check your connection and try again; program details remain available.';}
+    finally {assess.disabled = false;}
+  }
   const close = event.target.closest('[data-close-dialog]'); if (close) close.closest('dialog').close();
 });
 for (const dialog of document.querySelectorAll('.opp-dialog')) {
@@ -102,11 +114,29 @@ for (const dialog of document.querySelectorAll('.opp-dialog')) {
 function openDetail(id) {
   const p = programs.find(p => p.id === id); if (!p) return;
   $('program-detail').innerHTML = `<p class="opp-kicker">${escapeHTML(p.short)} / THE FIELD GUIDE</p><h2 id="detail-title">${escapeHTML(p.name)}</h2><p class="detail-intro">${escapeHTML(p.description)}</p><div class="detail-facts"><span>${escapeHTML(p.location)}</span><span>${escapeHTML(p.duration)}</span></div>
+    <div class="detail-fit-invite"><div><span aria-hidden="true">✳</span><h3>Turn curiosity into a next step.</h3></div><p>A short, provider-informed checklist with transparent points and practical ways to prepare.</p><button type="button" class="opp-button primary" data-assess="${p.id}">Check my application fit ↗</button><p role="status" class="fit-loading-status"></p></div>
     ${[['Who it’s for',p.eligibility],['Cost & funding',p.costNote],['Application window',p.deadline],['Selection & admission',p.admissions]].map(([heading,text]) => `<div class="detail-block"><h3>${heading}</h3><p>${escapeHTML(text)}</p></div>`).join('')}
     ${p.alternative ? `<div class="detail-block"><h3>A current alternative to explore</h3><button type="button" class="opp-text-button" data-detail="${p.alternative}">Duke Summer Session ↗</button><p>A separate program with different fees and eligibility.</p></div>` : ''}
     <div class="detail-block"><h3>Check the original sources</h3><p>Confirm current availability and all requirements before applying. Matching is based on your preferences, not an admission prediction.</p><div class="detail-source-links">${[p.url,...p.sources].map((url,i) => external(url, i === 0 ? 'Official program ↗' : `Provider details ${i} ↗`)).join('')}</div></div><p class="detail-reviewed">GUIDE REVIEWED ${reviewedOn} · ${p.coordinates ? 'CAMPUS PIN IS APPROXIMATE' : 'ONLINE PROGRAM'}</p>
     <div class="detail-actions">${external(p.url, `${p.status === 'archived' ? 'Visit official archive' : 'Visit official program'} ↗`, 'opp-button primary')}<button class="opp-text-button detail-save" type="button" data-save="${p.id}">Save to shortlist +</button></div>`;
   syncSaveButtons(); const dialog = $('program-dialog'); if (!dialog.open) dialog.showModal(); dialog.scrollTop = 0;
+}
+
+let fitLoading;
+function loadFitAssessment() {
+  if (!fitLoading) fitLoading = Promise.all([
+    import('./opportunities-fit.js?v=1'),
+    new Promise((resolve,reject) => {
+      const existing = document.querySelector('link[data-fit-style]');
+      if (existing?.sheet) {resolve(); return;}
+      existing?.remove();
+      const css = document.createElement('link'); css.rel = 'stylesheet'; css.href = 'opportunities-fit.css?v=1'; css.dataset.fitStyle = 'true';
+      const timer = setTimeout(()=>{css.remove();reject(new Error('Stylesheet timeout'));},10000);
+      css.onload = ()=>{clearTimeout(timer);resolve();}; css.onerror = ()=>{clearTimeout(timer);css.remove();reject(new Error('Stylesheet unavailable'));};
+      document.head.append(css);
+    })
+  ]).then(([module])=>module).catch(error=>{fitLoading=null;throw error;});
+  return fitLoading;
 }
 
 async function loadMapLibrary() {

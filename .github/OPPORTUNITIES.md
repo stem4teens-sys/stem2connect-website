@@ -32,3 +32,17 @@ The compass uses inline SVG and event-driven CSS transforms. There is no additio
 Run `node .github/scripts/build-opportunities.mjs` for directory validation, matching regression checks, startup budgets, and the generated fallback page. Run `bash .github/scripts/build-effects.sh` for the complete image/globe build and regression checks. Do not edit `opportunities-directory.html` directly; it is generated.
 
 Before publishing, test desktop and mobile, the full finder, combinations with no results, shortlist persistence, detail dialogs, keyboard focus, program links, geographic pins, map filters, and the suggestion draft. The homepage and existing globe implementation remain separate from these page-specific files.
+
+## Application-fit assessment
+
+Program details now offer a separate, on-demand assessment. `opportunities-fit-data.mjs` contains the provider-informed questions, source URLs, and editorial weights. `opportunities-fit.js` renders the questionnaire and point breakdown; its style and modules load only when an assessment is opened. No server, account, model, or analytics endpoint receives the answers. Answers are kept per program in tab memory, not browser storage, and disappear on reload.
+
+There are 13 scored rubrics. The discontinued Duke academy and the three offerings marked unconfirmed (OSU robotics, DSAP and UA Little Rock) explain why no score is available. Enrollment and introductory programs use exploration-fit questions rather than rewarding prior research, awards, or expensive extracurriculars.
+
+For each scored item, the answer earns 0, 0.5, or 1 times its weight. Weights total 100. A final score requires all scoring items answered and all eligibility checks marked Yes. No/unknown eligibility suppresses the final score; it cannot be overridden by points. Missing and “Not sure” responses remain unknown, never zero. When eligibility is confirmed but answers are missing, the UI shows the possible point range without renormalizing the answered portion. That range is not a statistical confidence interval.
+
+75–100 is labeled strong checklist alignment, 45 to below 75 some alignment, and below 45 room to prepare. Half-point totals are preserved so the breakdown adds up exactly. These weights and thresholds are STEM2Connect's editorial choices, not university admissions weights, a research-validated predictor, or percentages of acceptance. They are displayed in the methodology section. Scores are specific to each checklist and should not be compared across programs. No demographic characteristics, income amounts, exact grades, essays, names, transcripts, or recommendation contents are collected. The full provider context and requirements still matter.
+
+Keep each new question tied to a provider URL and record the review date and method version. Distinguish explicit admissions criteria from inferred preparation or activity fit. Do not add supposed acceptance rates from cohort sizes or unofficial anecdotes. Update the published date/eligibility fields alongside a rubric when sources change. The SUMMET entry was corrected after its official FAQ confirmed that it has no residency restriction.
+
+Run `node .github/scripts/check-opportunities-fit.mjs` for formula and loading regression checks; the full existing build also runs it. Browser checks should include missing answers, a failed requirement with otherwise maximum points, changing an answer after a result, per-program answer isolation, clear/reopen behavior, source links, keyboard dismissal, and narrow screens.
