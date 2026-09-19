@@ -1,0 +1,60 @@
+/* Scroll choreography decorates the existing layout; no pinning or scroll locks. */
+.hackathon-page .hero h1 .motion-word { transform-origin: left bottom; }
+.hackathon-page main > section[id] { scroll-margin-top: 90px; }
+.gsap-motion .timeline { position: relative; }
+.gsap-motion .timeline::before,
+.gsap-motion .timeline::after {
+  content: "";
+  position: absolute;
+  left: 45px;
+  top: 20px;
+  bottom: 20px;
+  width: 1px;
+  pointer-events: none;
+  background: var(--line);
+}
+.gsap-motion .timeline::after {
+  background: linear-gradient(var(--cyan), var(--acid));
+  transform-origin: top;
+  transform: scaleY(var(--sequence-progress, 0));
+}
+.gsap-motion .timeline > li > span {
+  align-self: start;
+  position: relative;
+  z-index: 1;
+  width: 92px;
+  text-align: center;
+  padding-block: 4px;
+  background: var(--panel);
+  transition: color .25s ease;
+}
+.gsap-motion .timeline > li.is-current > span { color: var(--acid); }
+.gsap-motion .timeline > li.is-current h3 { color: var(--acid); }
+.gsap-motion .timeline h3 { transition: color .25s ease; }
+.gsap-motion .track-grid article { position: relative; overflow: hidden; }
+.gsap-motion .track-grid article::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--acid), var(--cyan));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .45s ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .gsap-motion .track-grid article:hover::after { transform: scaleX(1); }
+  .gsap-motion .track-grid article:hover .track-motif { opacity: .8; transform: rotate(-8deg); }
+}
+.hackathon-page[data-motion-mode="mobile"] .timeline::before,
+.hackathon-page[data-motion-mode="mobile"] .timeline::after { display: none; }
+.hackathon-page[data-motion-mode="mobile"] .timeline > li > span { width: auto; text-align: left; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .hackathon-page *, .hackathon-page *::before, .hackathon-page *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
