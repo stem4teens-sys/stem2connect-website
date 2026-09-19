@@ -340,6 +340,94 @@
       }
     ]
   },
+  "assets/aira.png": {
+    "sourceHash": "6dab9502b8fa4e6b08ae0952c939597bebe9012c14bf67242bdcef91a9122030",
+    "sourceBytes": 704040,
+    "width": 739,
+    "height": 744,
+    "display": 288,
+    "sizes": "(max-width: 600px) 124px, (max-width: 1000px) 42vw, 260px",
+    "candidates": [
+      {
+        "path": "assets/optimized/aira-320-46019818d045.webp",
+        "width": 320,
+        "height": 322,
+        "bytes": 15836
+      },
+      {
+        "path": "assets/optimized/aira-480-a17380200e13.webp",
+        "width": 480,
+        "height": 483,
+        "bytes": 27118
+      }
+    ]
+  },
+  "assets/satvik.png": {
+    "sourceHash": "1fcf1a4cdf4a3265f7d1bfad652b22bb6cd406589329208c5842782008ff3c5c",
+    "sourceBytes": 726347,
+    "width": 790,
+    "height": 790,
+    "display": 288,
+    "sizes": "(max-width: 600px) 124px, (max-width: 1000px) 42vw, 260px",
+    "candidates": [
+      {
+        "path": "assets/optimized/satvik-320-cf1d39e7c50e.webp",
+        "width": 320,
+        "height": 320,
+        "bytes": 6542
+      },
+      {
+        "path": "assets/optimized/satvik-480-6bb46cd48b64.webp",
+        "width": 480,
+        "height": 480,
+        "bytes": 11190
+      }
+    ]
+  },
+  "assets/rudransh.png": {
+    "sourceHash": "b337d6ee8a94ea3c55088362f1a48c5638ced2c34ae8fb7c70712c753a652712",
+    "sourceBytes": 953563,
+    "width": 700,
+    "height": 828,
+    "display": 288,
+    "sizes": "(max-width: 600px) 124px, (max-width: 1000px) 42vw, 260px",
+    "candidates": [
+      {
+        "path": "assets/optimized/rudransh-320-6a3434931e21.webp",
+        "width": 320,
+        "height": 379,
+        "bytes": 22528
+      },
+      {
+        "path": "assets/optimized/rudransh-480-90ce32f9df87.webp",
+        "width": 480,
+        "height": 568,
+        "bytes": 43954
+      }
+    ]
+  },
+  "assets/cynthia.png": {
+    "sourceHash": "a984747b32350db405b60e29caed1ca0571d9cf628404473d851e3a02d8dfbab",
+    "sourceBytes": 649454,
+    "width": 817,
+    "height": 591,
+    "display": 288,
+    "sizes": "(max-width: 600px) 124px, (max-width: 1000px) 42vw, 260px",
+    "candidates": [
+      {
+        "path": "assets/optimized/cynthia-442-a6c216d186e2.webp",
+        "width": 442,
+        "height": 320,
+        "bytes": 19248
+      },
+      {
+        "path": "assets/optimized/cynthia-664-7e8bf6826b88.webp",
+        "width": 664,
+        "height": 480,
+        "bytes": 33280
+      }
+    ]
+  },
   "assets/favicon.png": {
     "sourceHash": "d067cdff2d1460f61d2f7d8f73f5c2c2139242e0a4008981a8c45cbb42d9f68c",
     "sourceBytes": 286537,
