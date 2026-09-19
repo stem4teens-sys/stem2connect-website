@@ -44,7 +44,7 @@ for page in ('index.html', 'hackathon/index.html', 'resources/index.html'):
         record = manifest[source]
         expected = ', '.join(('' if page == 'index.html' else '../') + c['path'] + f" {c['width']}w" for c in record['candidates'])
         assert img['srcset'] == expected, f'Incorrect responsive sources: {source}'
-        assert img['sizes'] == f"{record['display']}px"
+        assert img['sizes'] == record.get('sizes', f"{record['display']}px")
         assert int(img['width']) == record['width'] and int(img['height']) == record['height']
         assert "removeAttribute('srcset')" in img['onerror'], f'Original fallback missing: {source}'
         if 'team-avatar' in img.get('class', '') or record['display'] in (70, 82):

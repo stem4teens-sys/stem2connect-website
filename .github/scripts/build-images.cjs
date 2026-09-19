@@ -19,8 +19,9 @@ const profiles = {
   spotlight_webinar_symbol: { sizes: [224], display: 70 },
   ai_webinar_symbol: { sizes: [224], display: 70 },
   hums_logo: { sizes: [256], display: 82, extension: 'jpg' },
-  ...Object.fromEntries(['andrea', 'anna', 'adelaide', 'bernice', 'rafael', 'rylan', 'hadia']
-    .map(name => [name, { sizes: [192, 288], display: 96 }])),
+  ...Object.fromEntries(['andrea', 'anna', 'adelaide', 'bernice', 'rafael', 'rylan', 'hadia', 'arjun']
+    .map(name => [name, { sizes: [320, 480], display: 288, quality: 88,
+      responsive: '(max-width: 600px) 124px, (max-width: 1000px) 42vw, 260px' }])),
   favicon: { sizes: [96], format: 'png' }
 };
 const attr = (tag, name) => tag.match(new RegExp(`\\s${name}="([^"]*)"`))?.[1];
@@ -43,12 +44,14 @@ async function build() {
       const format = profile.format || 'webp';
       const { data, info } = await (format === 'png'
         ? image.png({ compressionLevel: 9 })
-        : image.webp({ lossless: true, exact: true, effort: 6 })).toBuffer({ resolveWithObject: true });
+        : image.webp(profile.quality
+          ? { quality: profile.quality, effort: 6 }
+          : { lossless: true, exact: true, effort: 6 })).toBuffer({ resolveWithObject: true });
       const output = `assets/optimized/${name}-${info.width}-${hash(data).slice(0, 12)}.${format}`;
       await fs.writeFile(path.join(root, output), data);
       candidates.push({ path: output, width: info.width, height: info.height, bytes: data.length });
     }
-    manifest[source] = { sourceHash: hash(input), sourceBytes: input.length, width: metadata.width, height: metadata.height, display: profile.display, candidates };
+    manifest[source] = { sourceHash: hash(input), sourceBytes: input.length, width: metadata.width, height: metadata.height, display: profile.display, ...(profile.responsive ? { sizes: profile.responsive } : {}), candidates };
   }
 
   for (const page of ['index.html', 'hackathon/index.html', 'resources/index.html']) {
@@ -62,7 +65,7 @@ async function build() {
       const record = manifest[source];
       if (!record || source.endsWith('/favicon.png')) return tag;
       tag = setAttr(tag, 'srcset', record.candidates.map(c => `${prefix}${c.path} ${c.width}w`).join(', '));
-      tag = setAttr(tag, 'sizes', `${record.display}px`);
+      tag = setAttr(tag, 'sizes', record.sizes || `${record.display}px`);
       tag = setAttr(tag, 'width', record.width);
       tag = setAttr(tag, 'height', record.height);
       tag = setAttr(tag, 'decoding', 'async');
