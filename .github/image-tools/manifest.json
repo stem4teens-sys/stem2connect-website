@@ -187,24 +187,24 @@
     ]
   },
   "assets/anna.png": {
-    "sourceHash": "3d0f2680ea51f5f982cc355fc1fe483f4ee494edd7b2c1cfd5b4d40b8b35f928",
-    "sourceBytes": 264888,
-    "width": 415,
-    "height": 477,
+    "sourceHash": "c46f40e9f928b7d2d9e380c2333c892b1a80b2cb076319f9e7dc7ca8776c8b0d",
+    "sourceBytes": 1243030,
+    "width": 832,
+    "height": 1248,
     "display": 288,
     "sizes": "(max-width: 600px) 124px, (max-width: 1000px) 42vw, 260px",
     "candidates": [
       {
-        "path": "assets/optimized/anna-320-d43e313ad354.webp",
+        "path": "assets/optimized/anna-320-200a4db6ebe7.webp",
         "width": 320,
-        "height": 368,
-        "bytes": 12448
+        "height": 480,
+        "bytes": 12808
       },
       {
-        "path": "assets/optimized/anna-415-dfb1e1de7ebf.webp",
-        "width": 415,
-        "height": 477,
-        "bytes": 18332
+        "path": "assets/optimized/anna-480-7e20a624f50e.webp",
+        "width": 480,
+        "height": 720,
+        "bytes": 23228
       }
     ]
   },
