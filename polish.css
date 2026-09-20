@@ -325,3 +325,64 @@ main p { text-wrap: pretty; }
   .team-section .team-card:hover, .team-section .team-card:hover .team-avatar { transform: none; }
   .team-section .team-card, .team-section .team-avatar, .team-section .team-card::before { transition: none; }
 }
+
+/* About: a connected sequence with the original brand palette and copy. */
+.about-section .two-column { grid-template-columns: minmax(0,1.12fr) minmax(0,.88fr); gap: clamp(32px,5vw,76px); align-items: center; }
+.about-section .about-headline { font-size: clamp(2.15rem,3.9vw,3.65rem); line-height: 1.06; letter-spacing: -.045em; margin-block: 22px 26px; text-wrap: initial; }
+.about-title-line { display: block; }
+.about-headline em { font-style: normal; color: var(--primary); }
+.about-headline > .about-title-line:first-child .motion-word { background: none; -webkit-text-fill-color: currentColor; color: var(--ink); }
+.about-section .large-text { max-width: 42ch; font-size: clamp(1rem,1.3vw,1.12rem); line-height: 1.8; }
+.about-index, .mission-index { font: 500 .68rem "IBM Plex Mono", monospace; letter-spacing: .08em; }
+.about-index { margin-right: 8px; opacity: .65; }
+.mission-index { display: block; color: var(--primary); margin-bottom: 16px; position: relative; }
+.about-section .mission-card { padding: clamp(28px,3vw,42px); }
+.about-section .mission-card p { max-width: 43ch; font-size: .97rem; line-height: 1.8; }
+.about-section .values-grid { position: relative; margin-top: 82px; padding-top: 28px; gap: 22px; }
+.about-section .value-card { position: relative; padding: 30px 26px 28px; }
+.about-section .value-card h3 { font-size: 1.32rem; margin-top: 14px; }
+.about-section .value-card p { font-size: .94rem; line-height: 1.75; }
+.about-section .value-index { font-size: .67rem; opacity: .65; }
+.about-section .value-symbol { position: absolute; left: 26px; top: -48px; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 50%; background: #fffaf2; border: 1px solid #aa000026; color: var(--primary); z-index: 2; transition: background .3s, border-color .3s; }
+.value-symbol svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.about-section .value-reached .value-symbol { background: #fff2cf; border-color: #aa000066; }
+.values-connection { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.values-connection path { fill: none; stroke-width: 1.4; }
+.values-track { stroke: #aa000022; }
+.values-progress { stroke: var(--primary); stroke-dasharray: 1; stroke-dashoffset: 1; }
+@media (max-width: 1020px) {
+  .about-section .two-column { grid-template-columns: 1fr; gap: 34px; }
+  .about-section .about-headline { font-size: clamp(2rem,5.5vw,3.3rem); }
+  .about-section .large-text, .about-section .mission-card p { max-width: 52ch; }
+  .about-section .values-grid { grid-template-columns: 1fr; padding: 0 0 0 52px; margin-top: 42px; gap: 20px; }
+  .about-section .value-card { padding: 24px; }
+  .about-section .value-symbol { left: -52px; top: 24px; }
+  .about-section .value-card h3 { margin-top: 8px; }
+}
+@media (max-width: 420px) {
+  .about-section .about-headline { font-size: clamp(1.65rem,7.4vw,2rem); }
+  .about-section .value-card { padding: 20px; }
+  .about-section .value-card h3 { font-size: 1.18rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .about-section .value-symbol { transition: none; }
+  .values-progress { stroke-dashoffset: 0 !important; }
+}
+
+/* Keep navigation compact before its labels collide with the brand. */
+.navbar .brand { flex-shrink: 0; white-space: nowrap; }
+@media (min-width: 1321px) {
+  .navbar { width: min(1400px,calc(100% - 48px)); }
+  .navbar .nav-links { gap: 3px; }
+  .navbar .nav-links a { padding-inline: 10px; font-size: .88rem; white-space: nowrap; }
+}
+@media (max-width: 1320px) {
+  .navbar { position: relative; }
+  .navbar .nav-toggle { display: block; position: relative; z-index: 120; flex-shrink: 0; }
+  .navbar .brand-name { display: inline; }
+  .navbar .nav-links { position: absolute; inset: var(--header-height) 0 auto auto; width: min(440px,100%); height: auto; max-height: calc(100dvh - var(--header-height) - 16px); overflow-y: auto; overscroll-behavior: contain; padding: 16px; flex-direction: column; align-items: stretch; gap: 6px; background: #fffaf2; border: 1px solid var(--border); border-radius: 0 0 22px 22px; box-shadow: var(--shadow-soft); transform: translateY(-8px); opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .18s, transform .18s, visibility .18s; z-index: 110; }
+  .navbar .nav-links.active { transform: none; opacity: 1; visibility: visible; pointer-events: auto; }
+  .navbar .nav-links a { justify-content: flex-start; width: 100%; min-height: 44px; padding: 10px 14px; font-size: .96rem; background: transparent; border: 0; }
+  .navbar .nav-links.active a { opacity: 1; transform: none; transition-delay: 0s; }
+}
+@media (prefers-reduced-motion: reduce) { .navbar .nav-links, .navbar .nav-links a { transition: none; } }
