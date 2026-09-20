@@ -9,9 +9,9 @@
   <link rel="stylesheet" href="styles.css" />
   <link rel="preload" href="../assets/fonts/general-variable.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="../assets/fonts/space-variable.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="../enhancements.css?v=4" />
-  <link rel="stylesheet" href="../hackathon-motion.css?v=1" />
-  <script type="module" src="../hackathon-motion.js?v=1"></script>
+  <link rel="stylesheet" href="../enhancements.css?v=6" />
+  <link rel="stylesheet" href="../hackathon-motion.css?v=2" />
+  <script type="module" src="../hackathon-motion.js?v=2"></script>
 </head>
 <body class="hackathon-page">
   <header class="site-header">
@@ -67,15 +67,37 @@
       </div>
     </section>
 
-    <section class="sequence section">
+    <section class="sequence section" id="build-sequence">
       <div class="section-kicker">[ 02 / YOUR BUILD SEQUENCE ]</div>
       <h2>From first idea<br />to <span>Demo Day.</span></h2>
+      <div class="sequence-workbench">
       <ol class="timeline">
         <li><span>01</span><div><h3>Register + form a team</h3><p>Bring friends, meet collaborators, or participate on your own.</p></div></li>
         <li><span>02</span><div><h3>Attend live AI sessions</h3><p>Learn problem validation, AI tools and APIs, design, and pitching. Every session is recorded.</p></div></li>
         <li><span>03</span><div><h3>Build with mentor support</h3><p>Create a simple, functional solution and get thoughtful feedback along the way.</p></div></li>
         <li><span>04</span><div><h3>Present at Demo Day</h3><p>Show what you built, what you learned, and the impact your project could make.</p></div></li>
       </ol>
+      <figure class="project-assembly" data-stage="0" aria-labelledby="assembly-title">
+        <div class="assembly-heading"><span id="assembly-title">PROJECT IN PROGRESS</span><span class="assembly-step" aria-hidden="true">01 / 04</span></div>
+        <svg class="assembly-screen" viewBox="0 0 420 310" aria-hidden="true" focusable="false">
+          <defs><pattern id="assembly-grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="#263b34" stroke-width=".5"/></pattern></defs>
+          <rect width="420" height="310" fill="url(#assembly-grid)"/>
+          <g class="assembly-sketch"><rect x="54" y="47" width="312" height="210" rx="9"/><path d="M54 77h312M70 91h63v149H70ZM148 93h202v56H148ZM148 164h92v75h-92ZM255 164h95v75h-95Z"/><circle cx="69" cy="62" r="2"/><circle cx="79" cy="62" r="2"/><circle cx="89" cy="62" r="2"/></g>
+          <g class="assembly-connections"><path d="M111 121h36l35 34h39M111 194h36l35-39M221 155h34l29-35h42M255 155l29 38h42"/><circle cx="111" cy="121" r="7"/><circle cx="111" cy="194" r="7"/><circle cx="221" cy="155" r="11"/><circle cx="326" cy="120" r="7"/><circle cx="326" cy="193" r="7"/></g>
+          <g class="assembly-components"><rect x="70" y="92" width="63" height="148" rx="4" fill="#1c352a"/><path d="M82 111h37M82 129h27M82 147h32" stroke="#75aa88" stroke-width="3"/><rect x="148" y="93" width="202" height="56" rx="4" fill="#203e35"/><path d="M161 109h68M161 122h42" stroke="#91c6a2" stroke-width="4"/><rect x="148" y="164" width="92" height="76" rx="4" fill="#17372f"/><rect x="255" y="164" width="95" height="76" rx="4" fill="#23372c"/><path d="M165 225v-21M183 225v-33M201 225v-15M220 225v-43" stroke="#4cf4dc" stroke-width="8"/><circle cx="302" cy="201" r="23" fill="none" stroke="#6a9268" stroke-width="7"/><path d="M302 178a23 23 0 0 1 23 23" fill="none" stroke="#d8ff37" stroke-width="7"/></g>
+          <g class="assembly-finished"><rect x="283" y="103" width="54" height="27" rx="4" fill="#d8ff37"/><path d="m299 116 7 6 13-14" fill="none" stroke="#183126" stroke-width="2.5"/><path d="M172 270h76M197 258v12M223 258v12" stroke="#6b9481" stroke-width="2"/><circle cx="348" cy="49" r="22" fill="#d8ff37"/><path d="m338 49 7 7 14-15" fill="none" stroke="#13271b" stroke-width="3"/></g>
+          <path class="assembly-pencil" d="m309 104 28-30 10 10-28 30-15 5Z" fill="#d8ff37" stroke="#13271b" stroke-width="2"/>
+        </svg>
+        <div class="assembly-status"><span class="assembly-phase">Sketch your idea</span><span class="assembly-dot" aria-hidden="true"></span></div>
+        <div class="assembly-controls" role="group" aria-label="Preview project-building stages">
+          <button type="button" data-assembly-stage="0" aria-pressed="true">01 <span>Sketch</span></button>
+          <button type="button" data-assembly-stage="1" aria-pressed="false">02 <span>Connect</span></button>
+          <button type="button" data-assembly-stage="2" aria-pressed="false">03 <span>Build</span></button>
+          <button type="button" data-assembly-stage="3" aria-pressed="false">04 <span>Present</span></button>
+        </div>
+        <figcaption>Follow the sequence, or select a stage to explore.</figcaption>
+      </figure>
+      </div>
     </section>
 
     <section class="tracks section" id="tracks">

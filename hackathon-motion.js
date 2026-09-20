@@ -131,7 +131,7 @@ function mountMotion({ gsap, ScrollTrigger }) {
       gsap.fromTo(timeline, { '--sequence-progress': 0 }, { '--sequence-progress': 1, ease: 'none',
         scrollTrigger: { trigger: timeline, start: 'top 65%', end: 'bottom 55%', scrub: .35 } });
       rows.forEach(row => {
-        ScrollTrigger.create({ trigger: row, start: 'top 65%', end: 'bottom 55%', toggleClass: 'is-current' });
+        if (!document.querySelector('.project-assembly')) ScrollTrigger.create({ trigger: row, start: 'top 65%', end: 'bottom 55%', toggleClass: 'is-current' });
         gsap.from(row.querySelector('div'), { x: 22, opacity: .7, duration: .65, ease: 'power3.out', clearProps: 'transform,opacity',
           scrollTrigger: { trigger: row, start: 'top 85%', once: true } });
       });
@@ -191,3 +191,48 @@ function stop() {
 reduced.addEventListener('change', () => { stop(); if (!reduced.matches) start(); });
 addEventListener('pagehide', event => { if (!event.persisted) { stop(); navObserver.disconnect(); } });
 start();
+
+// The project preview is independent of GSAP and the 3D scene download.
+(() => {
+  const panel = document.querySelector('.project-assembly');
+  if (!panel) return;
+  const section = panel.closest('.sequence');
+  const rows = [...section.querySelectorAll('.timeline > li')];
+  const buttons = [...panel.querySelectorAll('[data-assembly-stage]')];
+  const phases = ['Sketch your idea', 'Connect what you learn', 'Build a working project', 'Ready for Demo Day'];
+  let visible = false, frame = 0, current = -1;
+  function show(index) {
+    if (current === index) return;
+    current = index;
+    panel.dataset.stage = String(index);
+    panel.querySelector('.assembly-phase').textContent = phases[index];
+    panel.querySelector('.assembly-step').textContent = `0${index + 1} / 04`;
+    buttons.forEach((button, i) => button.setAttribute('aria-pressed', String(i === index)));
+    rows.forEach((row, i) => row.classList.toggle('assembly-current', i === index));
+  }
+  function update() {
+    frame = 0;
+    // Keep a deliberate keyboard selection stable while its control has focus.
+    if (reduced.matches || (panel.contains(document.activeElement) && document.activeElement.matches(':focus-visible'))) return;
+    let index = 0;
+    rows.forEach((row, i) => { if (row.getBoundingClientRect().top < innerHeight * .6) index = i; });
+    show(index);
+  }
+  function schedule() { if (visible && !frame && !reduced.matches) frame = requestAnimationFrame(update); }
+  buttons.forEach((button, index) => button.addEventListener('click', () => show(index)));
+  panel.addEventListener('focusout', schedule);
+  const observer = new IntersectionObserver(entries => {
+    visible = entries[0].isIntersecting;
+    if (visible) schedule();
+  });
+  observer.observe(section);
+  addEventListener('scroll', schedule, { passive: true });
+  addEventListener('resize', schedule, { passive: true });
+  reduced.addEventListener('change', () => {
+    if (frame) cancelAnimationFrame(frame);
+    frame = 0;
+    if (reduced.matches) show(3); else schedule();
+  });
+  show(reduced.matches ? 3 : 0);
+  panel.classList.add('assembly-ready');
+})();
