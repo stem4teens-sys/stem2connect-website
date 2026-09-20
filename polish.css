@@ -436,3 +436,153 @@ main p { text-wrap: pretty; }
 }
 @media print { .mission-network figcaption { display: none; } .pencil-underline path { animation: none; stroke-dashoffset: 0; } }
 .about-headline > .about-title-line:nth-child(2) > .motion-word { background: none; -webkit-text-fill-color: currentColor; color: var(--ink); }
+
+/* Event tickets: original schedule and artwork, with a readable date stub. */
+.events-section .upcoming-layout { grid-template-columns: minmax(250px,.68fr) minmax(0,1.32fr); align-items: start; gap: 30px; }
+.events-section .upcoming-timeline { gap: 22px; }
+.events-section .upcoming-timeline::before { display: none; }
+.events-section .event-ticket { --ticket-cut: 102px; position: relative !important; top: auto !important; scale: 1 !important; filter: none !important; grid-template-columns: 82px minmax(0,1fr); column-gap: 24px; row-gap: 14px; padding: 24px; border-radius: 15px; background: #fffefd; box-shadow: 0 5px 18px #38281209; }
+.events-section .event-ticket::before, .events-section .event-ticket::after { content: ''; position: absolute; left: var(--ticket-cut); width: 17px; height: 17px; border: 1px solid var(--border); border-radius: 50%; background: #fbfcf4; z-index: 3; opacity: 1; box-shadow: none; }
+.events-section .event-ticket::before { top: -10px; }
+.events-section .event-ticket::after { bottom: -10px; top: auto; right: auto; }
+.ticket-stub { grid-column: 1; grid-row: 1 / 3; height: 100%; border-right: 1px dashed #d9cbb6; padding-right: 18px; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+.event-ticket .timeline-date { text-align: center; }
+.ticket-month { display: block; font: 600 .65rem 'IBM Plex Mono',monospace; text-transform: uppercase; letter-spacing: .1em; }
+.ticket-day { display: block; font: 800 2.6rem 'Cabinet Grotesk',sans-serif; line-height: 1.2; }
+.ticket-day small { font-size: .7rem; vertical-align: super; letter-spacing: 0; }
+.event-ticket .timeline-icon { width: 48px; height: 48px; border-radius: 12px; margin-top: auto; }
+.event-ticket .timeline-main { grid-column: 2; align-self: center; }
+.event-ticket .timeline-main h4 { margin: 0; font-size: clamp(1.25rem,1.85vw,1.65rem); line-height: 1.16; }
+.event-ticket .timeline-meta { grid-column: 2; border-left: 0; border-top: 1px solid #e9e0d2; padding: 12px 0 0; font-size: .82rem; }
+.event-ticket .timeline-meta p { font-weight: 450; }
+.event-ticket .timeline-meta a { font-weight: 650; text-decoration: underline; text-decoration-color: #aa000044; text-underline-offset: 3px; }
+.ticket-trace { position: absolute; inset: -1px; border: 1px solid var(--primary); border-radius: inherit; pointer-events: none; clip-path: inset(0 100% 0 0); transition: clip-path .65s cubic-bezier(.16,1,.3,1); }
+.event-ticket:is(:hover,:focus-within) .ticket-trace { clip-path: inset(0); }
+.recordings-heading { margin-top: 66px; margin-bottom: 28px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.recordings-heading h3 { margin: 0; font-size: clamp(1.8rem,3vw,2.6rem); }
+.recordings-heading .section-label { margin: 0; }
+@media (max-width: 1000px) { .events-section .upcoming-layout { grid-template-columns: 1fr; } }
+@media (max-width: 600px) {
+  .events-section .upcoming-showcase { padding: 18px; }
+  .events-section .event-ticket { --ticket-cut: 76px; grid-template-columns: 57px minmax(0,1fr); gap: 12px; padding: 20px 16px; }
+  .ticket-stub { padding-right: 12px; }
+  .ticket-day { font-size: 2.15rem; }
+  .ticket-month { font-size: .56rem; }
+  .event-ticket .timeline-main h4 { font-size: 1.23rem; }
+  .event-ticket .timeline-meta { font-size: .78rem; }
+  .event-ticket .timeline-icon { width: 38px; height: 38px; }
+  .recordings-heading { flex-direction: column; align-items: flex-start; gap: 12px; }
+}
+
+/* Four small, finite illustrations; no canvas, video, or animation loop. */
+.activity-icon.mini-lab { width: 88px; height: 88px; border-radius: 24px; padding: 9px; overflow: visible; }
+.mini-lab svg { width: 100%; height: 100%; fill: none; stroke: #a34836; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.mini-lab.green-bg svg { stroke: #517a5d; }
+.mini-lab.yellow-bg svg { stroke: #9b7228; }
+.lab-wave { transform-origin: center; transform-box: fill-box; }
+.mini-lab.detail-entered .lab-wave { animation: lab-wave 1.1s ease-in-out; }
+.mini-lab.detail-entered .lab-bubble { animation: lab-bubble 1.2s ease-out; }
+.mini-lab.detail-entered .second-bubble { animation-delay: .18s; }
+.mini-lab.detail-entered .lab-message { transform-origin: center; transform-box: fill-box; animation: lab-message .65s cubic-bezier(.16,1,.3,1) both; }
+.mini-lab.detail-entered .second-message { animation-delay: .3s; }
+.lab-leaf { transform-box: fill-box; transform-origin: bottom right; }
+.lab-leaf.leaf-right { transform-origin: bottom left; }
+.mini-lab.detail-entered .lab-leaf { animation: lab-leaf 1.1s cubic-bezier(.16,1,.3,1); }
+.mini-lab.detail-entered .leaf-right { animation-delay: .16s; }
+@keyframes lab-wave { 0%,100% { transform: scaleY(1); } 25%,65% { transform: scaleY(.35); } 45%,80% { transform: scaleY(1.2); } }
+@keyframes lab-bubble { 0% { transform: translateY(7px); opacity: 0; } 30% { opacity: 1; } 80% { transform: translateY(-9px); opacity: 0; } 100% { transform: none; opacity: 1; } }
+@keyframes lab-message { from { transform: translateY(5px) scale(.75); opacity: .2; } to { transform: none; opacity: 1; } }
+@keyframes lab-leaf { from { transform: scale(.35) rotate(-24deg); } to { transform: none; } }
+
+/* Inside Tomorrow reading desk: every original article and destination remains. */
+.reading-room .resources-hero { padding-bottom: 24px; }
+.reading-room .resources-hero-card { padding: clamp(28px,4vw,54px); border-radius: 20px; }
+.reading-room .resources-hero h1 { max-width: 16ch; font-size: clamp(2.5rem,5vw,4.6rem); line-height: 1.03; }
+.reading-room .resources-archive-section > .section-heading { text-align: left; }
+.reading-room .resources-archive-section > .section-heading h2 { max-width: 22ch; }
+.reading-tools { display: grid; grid-template-columns: minmax(0,1fr) minmax(220px,.4fr); gap: 22px; align-items: end; margin-bottom: 26px; }
+.reading-tools[hidden], .publication-card[hidden], .reading-empty[hidden] { display: none !important; }
+.reading-filters { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.reading-filters button { min-height: 42px; padding: 9px 15px; border: 1px solid #e4d7c3; background: #fffdf8; border-radius: 30px; font: 550 .83rem 'General Sans',sans-serif; color: var(--ink); cursor: pointer; transition: background .18s,border-color .18s; }
+.reading-filters button[aria-pressed=true] { background: var(--primary); border-color: var(--primary); color: #fffaf2; }
+.reading-search { display: grid; gap: 8px; font-size: .75rem; font-weight: 650; }
+.reading-search input { width: 100%; min-height: 46px; border: 1px solid #d9ccb8; border-radius: 9px; padding: 10px 13px; background: #fffefd; color: var(--ink); font: 400 .88rem 'General Sans',sans-serif; }
+.reading-search input:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+.reading-tools .reading-count { grid-column: 1/-1; margin: -4px 0 0; font: 450 .72rem 'IBM Plex Mono',monospace; color: var(--muted); }
+.reading-room .reading-library { gap: 28px; align-items: stretch; }
+.reading-room .publication-card { --cover: #f8efdc; --cover-ink: #9d3526; position: relative; padding: 0; gap: 0; border-radius: 8px 18px 18px 8px; background: #fffefd; border-color: #e5dac7; overflow: hidden; box-shadow: 3px 3px 0 #e9dfcf,5px 5px 0 #fcf7ed,0 10px 24px #38281209; }
+.reading-room .publication-card[data-topic=health] { --cover: #edf3e9; --cover-ink: #427658; }
+.reading-room .publication-card[data-topic=environment] { --cover: #f5efd5; --cover-ink: #6b773d; }
+.reading-room .publication-card[data-topic=pathways] { --cover: #f8e9e2; --cover-ink: #a34536; }
+.publication-cover { position: relative; padding: 26px 26px 100px 30px; min-height: 345px; background: linear-gradient(90deg,#00000009,transparent 12px),var(--cover); border-bottom: 1px solid #38281212; }
+.publication-masthead { display: flex; justify-content: space-between; align-items: start; gap: 14px; margin-bottom: 30px; border-bottom: 1px solid #38281226; padding-bottom: 14px; color: var(--cover-ink); }
+.publication-masthead > span:first-child { font: 800 .82rem/.95 'Cabinet Grotesk',sans-serif; letter-spacing: -.025em; }
+.publication-masthead > span:last-child { font: 450 .57rem 'IBM Plex Mono',monospace; white-space: nowrap; }
+.publication-cover .tag { position: relative; z-index: 1; font-size: .65rem; background: #fffdf899; color: var(--cover-ink); border: 1px solid #38281216; padding: 5px 9px; margin-bottom: 15px; }
+.reading-room .publication-card h3 { position: relative; z-index: 1; margin: 0; font-size: 1.48rem; line-height: 1.12; letter-spacing: -.025em; }
+.publication-art { position: absolute; right: 22px; bottom: 14px; width: 84px; height: 76px; fill: none; stroke: var(--cover-ink); stroke-width: 1.5; stroke-linecap: round; opacity: .45; }
+.publication-detail { flex: 1; display: flex; flex-direction: column; align-items: start; gap: 20px; padding: 24px 26px 28px 30px; }
+.publication-detail .button { border: none; background: transparent; border-bottom: 1px solid #cbb69b; border-radius: 0; min-height: 44px; padding: 8px 0; box-shadow: none; font-size: .85rem; }
+.reading-room .publication-card.featured-publication { grid-column: 1/-1; display: grid; grid-template-columns: 1.35fr 1fr; }
+.featured-publication .publication-cover { min-height: 370px; padding: 34px 40px 90px; border-bottom: 0; border-right: 1px solid #38281216; }
+.reading-room .featured-publication h3 { max-width: 26ch; font-size: clamp(1.8rem,2.65vw,2.7rem); line-height: 1.1; }
+.featured-publication .publication-art { width: 140px; height: 95px; opacity: .28; }
+.featured-publication .publication-detail { justify-content: center; padding: clamp(26px,4vw,55px); }
+.featured-publication .publication-detail p { font-size: 1.08rem; }
+.featured-publication .publication-detail .button { margin-top: 0; }
+.featured-label { color: var(--primary); font: 600 .7rem 'IBM Plex Mono',monospace; text-transform: uppercase; letter-spacing: .08em; }
+.reading-empty { border: 1px dashed #d6c6ae; border-radius: 18px; padding: 44px; text-align: center; }
+.reading-empty h3 { font-size: 1.8rem; }
+@media (hover: hover) and (pointer: fine) {
+  .reading-room .publication-card:hover { translate: 0 -4px; box-shadow: 3px 6px 0 #e9dfcf,5px 8px 0 #fcf7ed,0 20px 30px #38281212; }
+}
+@media (max-width: 1000px) {
+  .reading-tools { grid-template-columns: 1fr; }
+  .reading-search { max-width: 440px; }
+  .reading-room .reading-library { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media (max-width: 650px) {
+  .reading-room .reading-library { grid-template-columns: 1fr; }
+  .reading-room .publication-card.featured-publication { display: flex; }
+  .featured-publication .publication-cover { padding: 26px 26px 90px 30px; min-height: 340px; border-right: 0; border-bottom: 1px solid #38281216; }
+  .reading-room .publication-card h3 { font-size: 1.65rem; }
+  .publication-cover { min-height: 310px; }
+  .reading-filters { gap: 7px; }
+  .reading-filters button { padding-inline: 12px; font-size: .78rem; }
+  .reading-search { max-width: none; }
+}
+
+/* A student invitation, with the original red palette and Discord action. */
+.invitation-card { position: relative; border-radius: 12px; outline: 1px solid #fff5d655; outline-offset: -12px; grid-template-columns: minmax(0,1fr) 280px; gap: 52px; }
+.invitation-card::before { content: ''; position: absolute; inset: 0 0 auto; height: 7px; background: repeating-linear-gradient(125deg,#fff5da 0 18px,#f0c755 18px 31px,transparent 31px 49px); opacity: .8; }
+.invitation-card h2 { max-width: 15ch; }
+.invitation-card > div:first-child > p:last-child { max-width: 50ch; }
+.invitation-card .join-actions { position: relative; display: flex; flex-direction: column; align-items: stretch; gap: 12px; padding-top: 155px; border-left: 1px solid #fff5d633; padding-left: 32px; }
+.invitation-card .join-actions .button { justify-content: center; }
+.invitation-card .button-primary { background: #fff4d7; border-color: #fff4d7; color: #850000; }
+.invitation-card .button-secondary { background: transparent; border: 1px solid #fff5d666; color: #fffaf2; }
+.invitation-stamp { position: absolute; top: -10px; right: 3px; width: 103px; padding: 10px 9px 7px; color: #9f231c; background: #fff3cd; border: 4px dotted #a74430; outline: 3px solid #fff3cd; transform: rotate(8deg); box-shadow: 2px 3px 0 #00000016; }
+.invitation-stamp > span { display: block; font: 650 .49rem 'IBM Plex Mono',monospace; text-align: center; letter-spacing: .03em; }
+.invitation-stamp svg { width: 100%; height: 68px; margin: 5px 0; fill: none; stroke: currentColor; stroke-width: 1.4; }
+.invitation-postmark { position: absolute; width: 165px; top: 22px; left: 8px; color: #fff3cd; opacity: .5; transform: rotate(-12deg); }
+.invitation-postmark svg { width: 100%; fill: none; stroke: currentColor; }
+.invitation-postmark text { fill: currentColor; stroke: none; font: 7px 'IBM Plex Mono',monospace; }
+.invitation-card.detail-entered .invitation-stamp { animation: invitation-press .75s cubic-bezier(.16,1,.3,1) both; }
+@keyframes invitation-press { 0% { transform: translateY(-14px) rotate(14deg) scale(1.15); opacity: .2; } 65% { transform: rotate(6deg) scale(.97); opacity: 1; } 100% { transform: rotate(8deg); } }
+@media (max-width: 800px) {
+  .invitation-card { grid-template-columns: 1fr; gap: 28px; }
+  .invitation-card h2 { max-width: 19ch; }
+  .invitation-card .join-actions { padding: 25px 132px 0 0; border-left: 0; border-top: 1px solid #fff5d633; min-height: 164px; }
+  .invitation-stamp { top: 32px; right: 2px; }
+  .invitation-postmark { display: none; }
+}
+@media (max-width: 440px) {
+  .invitation-card .join-actions { padding: 160px 0 0; }
+  .invitation-stamp { right: calc(50% - 51px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mini-lab *, .invitation-stamp { animation: none !important; }
+  .ticket-trace { transition: none; }
+  .reading-room .publication-card:hover { translate: none; }
+}
+.reading-room .resources-archive-section > .section-heading p:not(.section-label) { margin-inline: 0; }
