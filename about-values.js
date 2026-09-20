@@ -61,3 +61,58 @@
   document.fonts?.ready.then(measure);
   measure();
 })();
+
+// No render loop: the network responds only to pointer, focus, and selection events.
+(() => {
+  const network = document.querySelector('.mission-network');
+  if (!network) return;
+  const nodes = [...network.querySelectorAll('[data-mission-node]')];
+  const links = [...network.querySelectorAll('[data-connects]')];
+  let selected = null;
+  const name = node => node?.dataset.missionNode;
+  function highlight(node) {
+    nodes.forEach(item => item.classList.toggle('is-active', item === node));
+    links.forEach(link => link.classList.toggle('is-connected', !!node && link.dataset.connects.split(' ').includes(name(node))));
+  }
+  function restingNode() {
+    return nodes.find(node => node === document.activeElement) || selected;
+  }
+  nodes.forEach(node => {
+    node.addEventListener('pointerenter', event => { if (event.pointerType !== 'touch') highlight(node); });
+    node.addEventListener('pointerleave', () => highlight(restingNode()));
+    node.addEventListener('focus', () => highlight(node));
+    node.addEventListener('blur', () => highlight(selected));
+    node.addEventListener('click', () => {
+      selected = selected === node ? null : node;
+      nodes.forEach(item => item.setAttribute('aria-pressed', String(item === selected)));
+      highlight(selected);
+    });
+  });
+  network.addEventListener('keydown', event => {
+    if (event.key !== 'Escape') return;
+    selected = null;
+    nodes.forEach(node => node.setAttribute('aria-pressed', 'false'));
+    highlight(null);
+  });
+})();
+
+// One short stroke on entry. The finished underline is the no-JS/reduced-motion default.
+(() => {
+  const heading = document.querySelector('.about-headline');
+  if (!heading || !heading.querySelector('.pencil-underline')) return;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  if (reduced.matches || !('IntersectionObserver' in window)) return;
+  heading.classList.add('underline-pending');
+  const observer = new IntersectionObserver(entries => {
+    if (!entries.some(entry => entry.isIntersecting)) return;
+    heading.classList.remove('underline-pending');
+    heading.classList.add('underline-drawn');
+    observer.disconnect();
+  }, { threshold: .35 });
+  observer.observe(heading);
+  reduced.addEventListener('change', () => {
+    if (!reduced.matches) return;
+    observer.disconnect();
+    heading.classList.remove('underline-pending', 'underline-drawn');
+  });
+})();

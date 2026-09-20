@@ -386,3 +386,53 @@ main p { text-wrap: pretty; }
   .navbar .nav-links.active a { opacity: 1; transform: none; transition-delay: 0s; }
 }
 @media (prefers-reduced-motion: reduce) { .navbar .nav-links, .navbar .nav-links a { transition: none; } }
+
+/* Mission: small vector illustrations, event-driven connections, and a pencil stroke. */
+.about-section .two-column { row-gap: 38px; }
+.about-section .mission-card { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(150px,.38fr) 1fr; column-gap: 36px; align-items: start; }
+.about-section .mission-card .mission-index { grid-column: 1; margin-bottom: 10px; }
+.about-section .mission-card h3 { grid-column: 1; margin-bottom: 0; }
+.about-section .mission-card p { grid-column: 2; grid-row: 1 / 3; max-width: 76ch; }
+.pencil-phrase { display: inline-block; position: relative; white-space: nowrap; }
+.pencil-underline { position: absolute; width: 103%; height: .34em; left: -1.5%; bottom: -.26em; overflow: visible; pointer-events: none; }
+.pencil-underline path { fill: none; stroke: var(--primary); stroke-width: 2.4; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 0; }
+.pencil-underline path + path { stroke-width: 1.5; opacity: .65; }
+.underline-pending .pencil-underline path { stroke-dashoffset: 1; }
+.underline-drawn .pencil-underline path { animation: pencil-draw 1.05s cubic-bezier(.3,.05,.25,1) .16s both; }
+.underline-drawn .pencil-underline path + path { animation-duration: .65s; animation-delay: .78s; }
+@keyframes pencil-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+.mission-network { width: 100%; max-width: 480px; margin: 0 auto; align-self: center; }
+.mission-network-stage { position: relative; width: 100%; aspect-ratio: 440 / 350; isolation: isolate; }
+.mission-links { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.mission-links path { fill: none; stroke: #c9c1ab; stroke-width: 1.6; transition: stroke .25s ease, stroke-width .25s ease; }
+.mission-links path.is-connected { stroke: var(--primary); stroke-width: 2.2; }
+.mission-junctions { fill: #b2a98f; }
+.mission-node { position: absolute; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px; width: 34.5%; aspect-ratio: 1; padding: 12px 8px 16px; border-radius: 50%; border: 1px solid #e7dfd2; background: radial-gradient(circle at 35% 25%,#fffefd 20%,#fffaf2 100%); color: var(--ink); box-shadow: 0 3px 5px #38281204, 0 12px 26px #3828120b; transform: translate(-50%,-50%); cursor: pointer; -webkit-tap-highlight-color: transparent; transition: border-color .25s ease, box-shadow .25s ease, background .25s ease; }
+.mission-students { left: 50%; top: 23%; }
+.mission-research { left: 20%; top: 73%; }
+.mission-opportunities { left: 80%; top: 73%; }
+.mission-node .mission-art { display: block; width: 80%; height: 67%; overflow: visible; pointer-events: none; transform-origin: center bottom; transition: transform .35s cubic-bezier(.16,1,.3,1); }
+.mission-node > span { font-family: 'Cabinet Grotesk',system-ui,sans-serif; font-size: clamp(.9rem,1.35vw,1.18rem); font-weight: 800; line-height: 1.15; letter-spacing: -.025em; }
+.mission-node.is-active { border-color: var(--primary); background: radial-gradient(circle at 35% 25%,#fff9f3,#fceae4); box-shadow: 0 4px 8px #aa000009,0 14px 30px #aa000016; }
+.mission-node.is-active .mission-art { transform: translateY(-3px) rotate(-2deg); }
+.mission-node:focus-visible { outline: 2px solid var(--primary); outline-offset: 5px; }
+.mission-network figcaption { text-align: center; color: var(--muted); font-size: .78rem; letter-spacing: .025em; margin-top: 4px; }
+@media (max-width: 1020px) {
+  .mission-network { max-width: 440px; }
+  .mission-node > span { font-size: 1.05rem; }
+  .about-section .mission-card { column-gap: 24px; }
+}
+@media (max-width: 600px) {
+  .about-section .two-column { row-gap: 28px; }
+  .about-section .mission-card { display: block; }
+  .about-section .mission-card h3 { margin-bottom: 16px; }
+  .mission-node { padding: 10px 5px 13px; gap: 3px; }
+  .mission-node > span { font-size: clamp(.78rem,3.6vw,1.05rem); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pencil-underline path { animation: none !important; stroke-dashoffset: 0 !important; }
+  .mission-node, .mission-node .mission-art, .mission-links path { transition: none; }
+  .mission-node.is-active .mission-art { transform: none; }
+}
+@media print { .mission-network figcaption { display: none; } .pencil-underline path { animation: none; stroke-dashoffset: 0; } }
+.about-headline > .about-title-line:nth-child(2) > .motion-word { background: none; -webkit-text-fill-color: currentColor; color: var(--ink); }
