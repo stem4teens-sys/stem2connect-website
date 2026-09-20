@@ -37,8 +37,10 @@ for page in ('index.html', 'hackathon/index.html', 'resources/index.html'):
         assert icon['data-source-href'].endswith('assets/favicon.png')
     for img in parser.images:
         source = re.sub(r'^(?:\.\./|/)', '', img['src'])
+        # Missing/invalid loading values are eager by default in browsers.
+        is_eager = img.get('loading', '').lower() != 'lazy'
         if source not in manifest:
-            if page == 'index.html':
+            if page == 'index.html' and is_eager:
                 eager.add(source)
             continue
         record = manifest[source]
@@ -49,7 +51,7 @@ for page in ('index.html', 'hackathon/index.html', 'resources/index.html'):
         assert "removeAttribute('srcset')" in img['onerror'], f'Original fallback missing: {source}'
         if 'team-avatar' in img.get('class', '') or record['display'] in (70, 82):
             assert img['loading'] == 'lazy', f'Offscreen image must wait: {source}'
-        if page == 'index.html' and img['loading'] == 'eager':
+        if page == 'index.html' and is_eager:
             eager.add(record['candidates'][-1]['path'])
 
 eager.add(manifest['assets/favicon.png']['candidates'][0]['path'])
