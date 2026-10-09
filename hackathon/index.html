@@ -11,7 +11,10 @@
   <link rel="preload" href="../assets/fonts/space-variable.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="stylesheet" href="../enhancements.css?v=6" />
   <link rel="stylesheet" href="../hackathon-motion.css?v=2" />
-  <script type="module" src="../hackathon-motion.js?v=2"></script>
+  <link rel="stylesheet" href="cinematic.css?v=1" />
+  <link rel="stylesheet" href="cinematic-sections.css?v=1" />
+  <script type="module" src="../hackathon-motion.js?v=3"></script>
+  <script type="module" src="neural-engine.js?v=1"></script>
 </head>
 <body class="hackathon-page">
   <header class="site-header">
@@ -40,13 +43,58 @@
           <a class="button secondary" href="#program">Explore the program</a>
         </div>
       </div>
-      <div class="machine" aria-label="AI project signal visual">
-        <div class="orbit orbit-one"></div>
-        <div class="orbit orbit-two"></div>
+      <div class="machine neural-machine" aria-label="AI project signal visual">
+        <div class="engine-aura" aria-hidden="true"></div>
+        <svg class="engine-dial" viewBox="0 0 600 600" aria-hidden="true" focusable="false">
+          <defs>
+            <linearGradient id="dial-light" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#4cf4dc" stop-opacity=".08"/><stop offset=".55" stop-color="#4cf4dc" stop-opacity=".5"/><stop offset="1" stop-color="#d8ff37" stop-opacity=".25"/></linearGradient>
+          </defs>
+          <g fill="none" stroke="url(#dial-light)" stroke-width=".6">
+            <circle cx="300" cy="294" r="240"/>
+            <circle cx="300" cy="294" r="230" stroke-dasharray="1 11" stroke-width="4"/>
+            <path d="M300 38v28m0 456v28M44 294h28m456 0h28M112 106l20 20m336 336 20 20M112 482l20-20m336-336 20-20"/>
+            <path d="M70 130V70h60M470 70h60v60M70 470v60h60M470 530h60v-60" stroke-opacity=".5"/>
+          </g>
+          <g class="dial-revolve" fill="none" stroke="#d8ff37" stroke-width="1.4" stroke-linecap="round">
+            <circle cx="300" cy="294" r="240" stroke-dasharray="46 1462"/>
+            <circle cx="300" cy="294" r="218" stroke-dasharray="2 340" opacity=".55"/>
+          </g>
+          <g fill="none" stroke="#4cf4dc" stroke-opacity=".25" stroke-width=".7">
+            <path d="M76 156h53l35 35M462 300h60M151 476h45l32-36"/>
+            <circle cx="164" cy="191" r="3"/><circle cx="462" cy="300" r="3"/><circle cx="228" cy="440" r="3"/>
+          </g>
+        </svg>
+        <img class="neural-poster" src="neural-field.svg" width="600" height="600" alt="" fetchpriority="high" decoding="async" />
+        <canvas class="neural-canvas" aria-hidden="true"></canvas>
+        <svg class="engine-chip" viewBox="0 0 600 600" aria-hidden="true" focusable="false">
+          <defs>
+            <linearGradient id="chip-top" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#253c35"/><stop offset=".6" stop-color="#0b1714"/><stop offset="1" stop-color="#34522d"/></linearGradient>
+            <linearGradient id="chip-side"><stop stop-color="#101e1b"/><stop offset="1" stop-color="#44684f"/></linearGradient>
+            <linearGradient id="chip-edge"><stop stop-color="#4cf4dc" stop-opacity=".3"/><stop offset=".5" stop-color="#e6ffa1"/><stop offset="1" stop-color="#4cf4dc" stop-opacity=".4"/></linearGradient>
+            <radialGradient id="chip-glow"><stop stop-color="#d8ff37" stop-opacity=".16"/><stop offset="1" stop-color="#d8ff37" stop-opacity="0"/></radialGradient>
+          </defs>
+          <ellipse cx="300" cy="392" rx="103" ry="27" fill="url(#chip-glow)"/>
+          <g class="chip-stack">
+            <path d="m300 244 94 52v12l-94 53-94-53v-12Z" fill="url(#chip-side)" stroke="#467663" stroke-width=".6"/>
+            <path d="m300 244 94 52-94 53-94-53Z" fill="url(#chip-top)" stroke="#6a9980" stroke-width=".7"/>
+            <path d="m300 234 86 48v12l-86 48-86-48v-12Z" fill="url(#chip-side)" stroke="#29483a" stroke-width=".7"/>
+            <path d="m300 234 86 48-86 48-86-48Z" fill="#10281e" stroke="url(#chip-edge)" stroke-width="1"/>
+            <path d="m300 221 71 40v15l-71 40-71-40v-15Z" fill="url(#chip-side)" stroke="#669e78" stroke-width=".7"/>
+            <path d="m300 221 71 40-71 40-71-40Z" fill="url(#chip-top)" stroke="url(#chip-edge)" stroke-width="1.2"/>
+            <path d="m300 229 56 32-56 31-56-31Z" fill="#17261a" stroke="#d8ff37" stroke-opacity=".65" stroke-width=".6"/>
+            <g stroke="#4cf4dc" stroke-opacity=".65" stroke-width="1.2">
+              <path d="m224 303 8-5m1 10 8-5m1 10 8-5m1 10 8-5m1 10 8-5m1 10 8-5m1 10 8-5m1 10 8-5M377 303l-8-5m-1 10-8-5m-1 10-8-5m-1 10-8-5m-1 10-8-5m-1 10-8-5m-1 10-8-5m-1 10-8-5"/>
+            </g>
+            <path d="m214 296 86 48 86-48" fill="none" stroke="url(#chip-edge)" stroke-width="1.8"/>
+            <circle cx="300" cy="353" r="1.5" fill="#d8ff37"/>
+          </g>
+          <g fill="none" stroke="#4cf4dc" stroke-opacity=".2" stroke-width=".6"><path d="M300 365v27M248 331l-26 15h-37M352 331l26 15h37"/><ellipse cx="300" cy="396" rx="81" ry="19" stroke-dasharray="3 7"/></g>
+        </svg>
         <div class="core"><span>AI</span></div>
         <div class="node node-a">IDEA</div>
         <div class="node node-b">BUILD</div>
         <div class="node node-c">IMPACT</div>
+        <button class="engine-pause" type="button" aria-label="Pause AI visual animation" aria-pressed="false" hidden><svg viewBox="0 0 16 16" aria-hidden="true"><path class="pause-glyph" d="M5 3v10M11 3v10"/><path class="play-glyph" d="m5 3 8 5-8 5Z"/></svg></button>
       </div>
       <p class="scroll-cue">SCROLL TO INITIALIZE <span aria-hidden="true">&#8595;</span></p>
     </section>

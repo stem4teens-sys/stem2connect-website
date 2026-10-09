@@ -115,18 +115,20 @@ function mountMotion({ gsap, ScrollTrigger }) {
     // Phones keep their natural scroll with short entry animations only.
     if (desktop) {
       const heroScroll = gsap.timeline({ scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: .65 }, defaults: { ease: 'none' } });
-      heroScroll.to('.machine', { y: 68, rotation: 8, scale: .94 }, 0)
+      heroScroll.to('.machine', { y: 40, rotation: 0, scale: .97 }, 0)
         .to('.grid-field', { y: 115 }, 0)
         .to('.hero-copy', { y: -22 }, 0)
         .to(orbital, { scroll: 1150, onUpdate: sendOrbit }, 0);
-      const xTo = gsap.quickTo(orbital, 'x', { duration: .7, ease: 'power2.out', onUpdate: sendOrbit });
-      const yTo = gsap.quickTo(orbital, 'y', { duration: .7, ease: 'power2.out', onUpdate: sendOrbit });
-      hero.addEventListener('pointermove', event => {
-        const rect = hero.getBoundingClientRect();
-        xTo((event.clientX - rect.left) / rect.width * 2 - 1);
-        yTo((event.clientY - rect.top) / rect.height * 2 - 1);
-      }, eventOptions);
-      hero.addEventListener('pointerleave', () => { xTo(0); yTo(0); }, eventOptions);
+      if (!machine.classList.contains('neural-machine')) {
+        const xTo = gsap.quickTo(orbital, 'x', { duration: .7, ease: 'power2.out', onUpdate: sendOrbit });
+        const yTo = gsap.quickTo(orbital, 'y', { duration: .7, ease: 'power2.out', onUpdate: sendOrbit });
+        hero.addEventListener('pointermove', event => {
+          const rect = hero.getBoundingClientRect();
+          xTo((event.clientX - rect.left) / rect.width * 2 - 1);
+          yTo((event.clientY - rect.top) / rect.height * 2 - 1);
+        }, eventOptions);
+        hero.addEventListener('pointerleave', () => { xTo(0); yTo(0); }, eventOptions);
+      }
       ScrollTrigger.create({ start: 0, end: 'max', onUpdate: self => root.style.setProperty('--scroll-progress', self.progress.toFixed(4)) });
       gsap.fromTo(timeline, { '--sequence-progress': 0 }, { '--sequence-progress': 1, ease: 'none',
         scrollTrigger: { trigger: timeline, start: 'top 65%', end: 'bottom 55%', scrub: .35 } });
@@ -165,16 +167,18 @@ function mountMotion({ gsap, ScrollTrigger }) {
 async function start() {
   const current = ++generation;
   if (reduced.matches || saver) return;
-  // The 3D worker starts independently; it never waits for GSAP to initialize.
-  sceneObserver = new IntersectionObserver(entries => {
-    if (!entries.some(entry => entry.isIntersecting)) return;
-    sceneObserver.disconnect();
-    import('./scene-client.js?v=6').then(module => {
-      if (current !== generation || reduced.matches) return;
-      disposeScene = module.mountScene(machine, hero, 'orbital', reduced);
-    }).catch(() => {});
-  });
-  sceneObserver.observe(machine);
+  // Older pages retain their scene; the cinematic page owns its lightweight engine.
+  if (!machine.classList.contains('neural-machine')) {
+    sceneObserver = new IntersectionObserver(entries => {
+      if (!entries.some(entry => entry.isIntersecting)) return;
+      sceneObserver.disconnect();
+      import('./scene-client.js?v=6').then(module => {
+        if (current !== generation || reduced.matches) return;
+        disposeScene = module.mountScene(machine, hero, 'orbital', reduced);
+      }).catch(() => {});
+    });
+    sceneObserver.observe(machine);
+  }
   try {
     const library = await import('./assets/vendor/gsap/gsap-scrolltrigger-3.15.0.min.mjs');
     if (current !== generation || reduced.matches) return;
