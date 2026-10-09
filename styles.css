@@ -616,7 +616,7 @@ img {
   flex-shrink: 0;
   padding: 10px;
   border-radius: 10px;
-  background: var(--ink);
+  background: var(--white);
 }
 
 .collab-logo-panel .collab-logo {

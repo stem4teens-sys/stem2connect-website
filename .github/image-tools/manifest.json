@@ -165,17 +165,17 @@
     ]
   },
   "assets/stemist_education_logo.png": {
-    "sourceHash": "66f10c87645d269378c6f564e19e7375a9de1f35184b37e82cd5c6573b559456",
-    "sourceBytes": 77741,
-    "width": 1944,
+    "sourceHash": "6253505fe92a9c06c52bf4455732817e49d41b3ce70dbf3126795efe49990915",
+    "sourceBytes": 78813,
+    "width": 1946,
     "height": 635,
     "display": 180,
     "candidates": [
       {
-        "path": "assets/optimized/stemist_education_logo-588-0ecc2b30011a.webp",
+        "path": "assets/optimized/stemist_education_logo-588-dd1d77ac5171.webp",
         "width": 588,
         "height": 192,
-        "bytes": 15184
+        "bytes": 19986
       }
     ]
   },
