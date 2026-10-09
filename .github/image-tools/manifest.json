@@ -164,6 +164,21 @@
       }
     ]
   },
+  "assets/stemist_education_logo.png": {
+    "sourceHash": "66f10c87645d269378c6f564e19e7375a9de1f35184b37e82cd5c6573b559456",
+    "sourceBytes": 77741,
+    "width": 1944,
+    "height": 635,
+    "display": 280,
+    "candidates": [
+      {
+        "path": "assets/optimized/stemist_education_logo-588-0ecc2b30011a.webp",
+        "width": 588,
+        "height": 192,
+        "bytes": 15184
+      }
+    ]
+  },
   "assets/andrea.png": {
     "sourceHash": "9acfd8cea4e3aa1e3b2b76e8d298d03d9e3cb71a2521dd0607f5ac83262233b0",
     "sourceBytes": 298898,

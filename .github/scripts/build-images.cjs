@@ -22,6 +22,7 @@ const profiles = {
   spotlight_webinar_symbol: { sizes: [224], display: 70 },
   ai_webinar_symbol: { sizes: [224], display: 70 },
   hums_logo: { sizes: [256], display: 82, extension: 'jpg' },
+  stemist_education_logo: { sizes: [192], display: 280 },
   ...Object.fromEntries(['andrea', 'anna', 'adelaide', 'bernice', 'rafael', 'rylan', 'hadia', 'arjun', 'aira', 'satvik', 'rudransh', 'cynthia']
     .map(name => [name, { sizes: [320, 480], display: 288, quality: 88,
       responsive: '(max-width: 600px) 124px, (max-width: 1000px) 42vw, 260px' }])),
