@@ -26,7 +26,8 @@
   },
   {
     "name": "Kapil Dewade",
-    "title": "Member of Technical Staff, ID.me"
+    "title": "Member of Technical Staff, ID.me",
+    "photo": "assets/judge-07.jpg"
   },
   {
     "name": "Levin Schwab",
@@ -47,11 +48,13 @@
   },
   {
     "name": "Sumit Saurabh",
-    "title": "Software Engineer"
+    "title": "Software Engineer",
+    "photo": "assets/judge-12.jpg"
   },
   {
     "name": "Triyansha Vijayvargiya",
-    "title": "Agentic Payments Product, Amazon"
+    "title": "Agentic Payments Product, Amazon",
+    "photo": "assets/judge-13.jpg"
   },
   {
     "name": "Vinitha Reddy Gankidi",
